@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mosia-staging
+
+resources:
+  - ../base/namespace.yaml
+  - ../base/backend-deployment.yaml
+  - ../base/postgres-deployment.yaml
+  - ../base/redis-deployment.yaml
+  - ../base/configmap.yaml
+  - ../base/secrets.yaml
+  - ../base/ingress.yaml
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: ghcr.io/mosia/backend-api:staging
+    target:
+      kind: Deployment
+      name: backend-api
+  
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging-api.mosia.app
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: staging-api.mosia.app
+    target:
+      kind: Ingress
+      name: mosia-ingress
+
+  - patch: |-
+      - op: replace
+        path: /data/environment
+        value: staging
+      - op: replace
+        path: /data/log-level
+        value: DEBUG
+    target:
+      kind: ConfigMap
+      name: app-config
+
+replicas:
+  - name: backend-api
+    count: 2

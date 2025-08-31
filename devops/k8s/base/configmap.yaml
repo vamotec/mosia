@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: mosia
+data:
+  kafka-bootstrap-server: "kafka-service:9092"
+  environment: "staging"
+  log-level: "INFO"
+  server-port: "3010"
+  grpc-port: "9090"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  database: "mosia"

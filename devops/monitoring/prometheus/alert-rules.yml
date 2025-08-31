@@ -1,0 +1,125 @@
+groups:
+- name: mosia.rules
+  rules:
+
+  # Application Health
+  - alert: MosiaAPIDown
+    expr: up{job="mosia-backend-api"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Mosia API is down"
+      description: "Mosia API has been down for more than 1 minute."
+
+  - alert: MosiaAPIHighResponseTime
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="mosia-backend-api"}[5m])) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response time on Mosia API"
+      description: "95th percentile response time is {{ $value }}s for 5 minutes."
+
+  - alert: MosiaAPIHighErrorRate
+    expr: rate(http_requests_total{job="mosia-backend-api",status=~"5.."}[5m]) / rate(http_requests_total{job="mosia-backend-api"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on Mosia API"
+      description: "Error rate is {{ $value | humanizePercentage }} for 5 minutes."
+
+  # Database Health
+  - alert: PostgreSQLDown
+    expr: up{job="postgres-exporter"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "PostgreSQL is down"
+      description: "PostgreSQL database has been down for more than 1 minute."
+
+  - alert: PostgreSQLTooManyConnections
+    expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "PostgreSQL too many connections"
+      description: "PostgreSQL has {{ $value | humanizePercentage }} connections used."
+
+  - alert: PostgreSQLSlowQueries
+    expr: rate(pg_stat_database_tup_returned[5m]) / rate(pg_stat_database_tup_fetched[5m]) < 0.1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "PostgreSQL slow queries detected"
+      description: "PostgreSQL query efficiency is {{ $value | humanizePercentage }}."
+
+  # Redis Health
+  - alert: RedisDown
+    expr: up{job="redis-exporter"} == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Redis is down"
+      description: "Redis cache has been down for more than 1 minute."
+
+  - alert: RedisHighMemoryUsage
+    expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Redis high memory usage"
+      description: "Redis memory usage is {{ $value | humanizePercentage }}."
+
+  # Infrastructure Health
+  - alert: HighCPUUsage
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage is {{ $value }}% on {{ $labels.instance }}."
+
+  - alert: HighMemoryUsage
+    expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}."
+
+  - alert: DiskSpaceLow
+    expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low disk space"
+      description: "Disk usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}."
+
+  # Kubernetes Health
+  - alert: KubernetesPodCrashLooping
+    expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Kubernetes pod crash looping"
+      description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping."
+
+  - alert: KubernetesNodeNotReady
+    expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Kubernetes node not ready"
+      description: "Node {{ $labels.node }} is not ready for 5 minutes."

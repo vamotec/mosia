@@ -1,0 +1,130 @@
+# === Mosia项目 .gitignore ===
+
+# === Scala/SBT ===
+target/
+project/target/
+project/project/target/
+.bsp/
+.metals/
+.vscode/metals/
+*.log
+.cache-main
+.cache-tests
+
+# === Flutter/Dart ===
+# Build outputs
+**/build/
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+**/pubspec.lock
+
+# Flutter/Dart generated files
+**/*.g.dart
+**/*.freezed.dart
+**/*.mocks.dart
+
+# iOS
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/.symlinks/
+
+# Android
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+
+# === Python (微服务) ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# === Docker ===
+.dockerignore
+docker-compose.override.yml
+
+# === 开发环境 ===
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.settings/
+.classpath
+
+# === 系统文件 ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# === 日志和临时文件 ===
+logs/
+*.log
+tmp/
+temp/
+
+# === 环境配置 ===
+.env
+.env.local
+.env.production
+.env.staging
+
+# === 密钥和证书 ===
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+
+# === 备份文件 ===
+*.bak
+*.backup
+*.old
+*.orig
+
+# === 包管理器 ===
+node_modules/
+.npm
+.yarn/
+.pnp.*
+
+# === 构建产物 ===
+dist/
+out/
+coverage/
+
+# === Terraform ===
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# === 分析报告 (可选包含) ===
+# 如果不想提交分析报告，取消下面注释
+*_Analysis_*.md

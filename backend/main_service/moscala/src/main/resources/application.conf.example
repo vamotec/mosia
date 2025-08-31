@@ -1,0 +1,104 @@
+app {
+  mosiaEnv = "Dev"
+  scala = "Dev"
+  deployment = "Example"
+  mosia = "Beta"
+
+  redis {
+    host = ${?REDIS_HOST}           # e.g., "localhost"
+    port = ${?REDIS_PORT}           # e.g., 6379
+  }
+
+  database {
+    jdbcUrl = ${?DB_DEFAULT_URL}     # e.g., "jdbc:postgresql://localhost:5432/example"
+    username = ${?DB_DEFAULT_USER}   # e.g., "example"
+    password = ${?DB_DEFAULT_PASSWORD} # e.g., "secret"
+    maximumPoolSize = 10
+  }
+
+  storage {
+    default = "fs"
+    fs {
+      path = "/mnt/data"
+      createIfMissing = true
+    }
+    s3 {
+      region = "us-east-1"
+      accessKeyId = ${?S3_ACCESS_KEY_ID}
+      secretAccessKey = ${?S3_SECRET_ACCESS_KEY}
+    }
+    r2 {
+      region = "us-east-1"
+      accountId = ${?R2_ACCOUNT_ID}
+      accessKeyId = ${?R2_ACCESS_KEY_ID}
+      secretAccessKey = ${?R2_SECRET_ACCESS_KEY}
+    }
+  }
+
+  storages {
+    avatar {
+      storage {
+        provider = "fs"
+        bucket = "local"
+      }
+      publicPath = "https://www.example.com/avatar.png"
+    }
+    blob {
+      storage {
+        provider = "fs"
+        bucket = "local"
+      }
+    }
+  }
+
+  auth {
+    session {
+      ttl = 1296000   # 15 days
+      ttr = 604800    # 7 days
+    }
+    allowSignup = true
+    requireEmailDomainVerification = false
+    requireEmailVerification = true
+
+    password {
+      min = 8
+      max = 32
+    }
+  }
+
+  flags {
+    earlyAccessControl = false
+  }
+
+  doc {
+    history {
+      interval = 600000  # 10 minutes
+    }
+    experimental {
+      yocto = false
+    }
+  }
+
+  mailer {
+    smtpHost = ${?SMTP_HOST}         # e.g., "smtp.example.com"
+    smtpPort = ${?SMTP_PORT}         # e.g., 587
+    username = ${?SMTP_USERNAME}     # e.g., "example"
+    password = ${?SMTP_PASSWORD}     # e.g., "12345678"
+  }
+
+  server {
+    externalUrl = ""                # Optional
+    https = false
+    host = "localhost"
+    port = 3010
+    path = ""
+    name = "example"
+  }
+
+  kafka {
+    bootstrapServers = [${?KAFKA_BOOTSTRAP_SERVER}]  # e.g., "localhost:9092"
+    groupId = "kafka-event-bus-group"
+    autoCommit = false
+    offsetStrategy = "earliest"
+  }
+}
