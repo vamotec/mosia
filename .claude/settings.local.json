@@ -16,7 +16,9 @@
       "Bash(timeout 10 sbt run)",
       "Bash(echo \"Exit code: $?\")",
       "Bash(gtimeout:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
