@@ -7,12 +7,14 @@
   "keywords": ["collaboration", "ai", "workspace", "scala", "flutter"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/你的用户名/mosia.git"
+    "url": "https://github.com/vamotec/mosia.git"
   },
   "scripts": {
-    "dev": "cd backend/main_service/moscala && docker-compose -f docker-compose.dev.yml up -d",
-    "dev:stop": "cd backend/main_service/moscala && docker-compose -f docker-compose.dev.yml down",
-    "dev:logs": "cd backend/main_service/moscala && docker-compose -f docker-compose.dev.yml logs -f",
+    "dev": "make dev",
+    "dev:stop": "make dev-stop",
+    "dev:logs": "make logs",
+    "env:setup": "make env-setup",
+    "env:validate": "make env-validate",
     "build": "make build",
     "test": "make test",
     "format": "make format",

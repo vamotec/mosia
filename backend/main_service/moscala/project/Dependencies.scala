@@ -1,98 +1,16 @@
-import com.github.tototoshi.sbt.slick.CodegenPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
-import slick.codegen.SourceCodeGenerator
-import slick.model as m
 
 import scala.io.Source
 import scala.util.Try
 
 object Dependencies {
-  lazy val databaseUrl: String      = sys.env.getOrElse("DB_DEFAULT_URL", "DB_URL is not set")
-  lazy val databaseUser: String     = sys.env.getOrElse("DB_DEFAULT_USER", "DB_DEFAULT_USER is not set")
-  lazy val databasePassword: String = sys.env.getOrElse("DB_DEFAULT_PASSWORD", "DB_DEFAULT_PASSWORD is not set")
+  // 这些变量保留给 flyway 使用
+  lazy val databaseUrl: String      = sys.env.getOrElse("DB_DEFAULT_URL", "jdbc:postgresql://localhost:5432/mosia_dev")
+  lazy val databaseUser: String     = sys.env.getOrElse("DB_DEFAULT_USER", "mosia")
+  lazy val databasePassword: String = sys.env.getOrElse("DB_DEFAULT_PASSWORD", "ttr851217")
 
-  def settingsCodegen = Seq(
-    slickCodegenDatabaseUrl           := databaseUrl,
-    slickCodegenDatabaseUser          := databaseUser,
-    slickCodegenDatabasePassword      := databasePassword,
-    slickCodegenDriver                := slick.jdbc.PostgresProfile,
-    slickCodegenJdbcDriver            := "org.postgresql.Driver",
-    slickCodegenOutputPackage         := "app.mosia.models",
-    slickCodegenExcludedTables        := Seq("schema_version"),
-    slickCodegenCodeGenerator         := { (model: m.Model) =>
-      new SourceCodeGenerator(model) {
-        override def writeStringToFile(content: String, folder: String, pkg: String, fileName: String): Unit =
-          // 遍历所有表
-          for (table <- model.tables) {
-            val tableName          = table.name.table
-            val processedTableName = tableName.split('_').map(_.capitalize).mkString("")
-            val newFileName        = s"Db$processedTableName.scala" // 使用表名生成文件名
-            val tableContent       = generateCode(table, pkg)       // 为每张表生成代码
-
-            // 调用父类方法写入文件
-            super[SourceCodeGenerator].writeStringToFile(tableContent, folder, pkg, newFileName)
-          }
-
-        private def generateCode(table: m.Table, pkg: String): String = {
-          val tableName          = table.name.table
-          val processedTableName = tableName.split('_').map(_.capitalize).mkString("")
-          // 生成字段代码，包括键属性的注释
-          val fields             = table.columns.map { column =>
-            val columnName          = column.name
-            val processedColumnName =
-              if (columnName == "type") "`type`"
-              else
-                columnName
-                  .split('_')
-                  .zipWithIndex
-                  .map { case (part, index) =>
-                    if (index == 0) part // 首部分保持不变
-                    else part.capitalize // 其余部分首字母大写
-                  }
-                  .mkString("")
-            val columnType          = mapColumnType(column.tpe, column.nullable) // 映射类型并处理可空性
-            s"  $processedColumnName: $columnType"
-          }.mkString(", \n")
-          // 生成完整代码
-          s"""
-             |// AUTO-GENERATED Quill data model
-             |package $pkg
-             |
-             |import app.mosia.core.types.JSONValue
-             |import io.getquill.*
-             |import zio.json.*
-             |
-             |case class Db$processedTableName(
-             |$fields
-             |)
-             |
-             |object Db$processedTableName:
-             |    inline given schema: Quoted[EntityQuery[Db$processedTableName]] = quote:
-             |      querySchema[Db$processedTableName]("public.$tableName")
-             |
-             |    given JsonEncoder[Db$processedTableName] = DeriveJsonEncoder.gen[Db$processedTableName]
-             |    given JsonDecoder[Db$processedTableName] = DeriveJsonDecoder.gen[Db$processedTableName]
-          """.stripMargin
-        }
-
-        // Helper function to map database types to Scala types, with nullable handling
-        private def mapColumnType(dbType: String, nullable: Boolean): String = {
-          // println(s"Debug: dbType = $dbType") // 打印 dbType 的值，用于调试
-          val normalizedType = dbType match {
-            case "java.sql.Timestamp" => "java.time.Instant"
-            case "java.sql.Blob"      => "JSONValue"
-            case "Short"              => "Int"
-            case _                    => dbType // 默认类型
-          }
-          if (nullable) s"Option[$normalizedType]" else normalizedType
-        }
-      }
-    },
-    slickCodegenOutputToMultipleFiles := true,
-    Compile / sourceGenerators += slickCodegen.taskValue,
-    slickCodegenOutputDir             := (Compile / sourceManaged).value
-  )
+  // 移除 settingsCodegen，因为现在使用预生成的模型文件
 
   val zioVersion        = "2.1.20"
   val zioHttpVersion    = "3.4.0"

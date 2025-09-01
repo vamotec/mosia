@@ -7,7 +7,6 @@ import app.mosia.infra.auth.AuthServiceImpl
 import app.mosia.infra.context.UserContext
 import app.mosia.infra.dao.impl.QuillContext.dataSourceLayer
 import app.mosia.infra.eventbus.{ EventBus, EventBusImpl }
-import app.mosia.infra.helpers.FlywayMigration.migrateZIO
 import app.mosia.infra.helpers.extractor.CurrentUserExtractorImpl
 import app.mosia.infra.jwt.JwtServiceImpl
 import app.mosia.interface.grpc.GreeterImpl
@@ -103,21 +102,11 @@ object Main extends ZIOAppDefault:
           ErrorHandlingMiddleware.middleware @@
           cors(corsConfig)
       finalRoutes       = redirectRootToDocs ++ docRoutes ++ tapirRoutes
-      httpServer       <- ZIO.service[HttpServer]
-      _                <- HttpServer.install(finalRoutes)
-      httpPort         <- httpServer.port
-      _                <- ZIO.logInfo(s"Server started on port $httpPort")
+      _                <- HttpServer.serve(finalRoutes)
     } yield ()
 
   override val run: ZIO[ZIOAppArgs & Scope, Any, Any] =
     ZIO.logInfo("Starting application") *>
-      AppConfig.live.build.flatMap { env =>
-        val configRef = env.get
-        for
-          config <- configRef.get
-          _      <- migrateZIO(config)
-        yield ()
-      } *>
       grpcServer.build *>
       httpServer
         .provide(

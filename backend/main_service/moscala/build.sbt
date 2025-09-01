@@ -17,6 +17,8 @@ def settingsApp = Seq(
   name                             := "moscala",
   Compile / run / mainClass        := Option("app.mosia.Main"),
   testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
+  assembly / assemblyJarName       := "moscala.jar",
+  assembly / test                  := {},
   assembly / assemblyMergeStrategy := {
     case PathList("META-INF", "services", _*)                                         => MergeStrategy.concat
     case PathList("META-INF", "io.netty.versions.properties")                         => MergeStrategy.first
@@ -82,19 +84,9 @@ def settingsApp = Seq(
   )
 )
 
-lazy val flyway = (project in file("flyway"))
-  .enablePlugins(FlywayPlugin)
-  .settings(
-    flywayUrl       := databaseUrl,
-    flywayUser      := databaseUser,
-    flywayPassword  := databasePassword,
-    flywayLocations := Seq("filesystem:src/main/resources/db/migration")
-  )
-
 lazy val root = (project in file("."))
-  .enablePlugins(JavaAppPackaging, CodegenPlugin, BuildInfoPlugin, AssemblyPlugin)
+  .enablePlugins(JavaAppPackaging, BuildInfoPlugin, AssemblyPlugin)
   .settings(settingsApp)
-  .settings(settingsCodegen)
 
 buildInfoKeys    := Seq[BuildInfoKey](
   name,

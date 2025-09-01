@@ -3,7 +3,20 @@
     "allow": [
       "mcp__sequential-thinking__sequentialthinking",
       "WebSearch",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(make:*)",
+      "Bash(grep:*)",
+      "Bash(docker-compose:*)",
+      "Bash(DB_DEFAULT_URL=\"jdbc:postgresql://localhost:5432/mosia_dev\" DB_DEFAULT_USER=\"mosia\" DB_DEFAULT_PASSWORD=\"ttr851217\" sbt compile)",
+      "Bash(docker logs:*)",
+      "Bash(sbt:*)",
+      "Bash(docker exec:*)",
+      "Bash(curl:*)",
+      "Bash(DB_DEFAULT_URL=\"jdbc:postgresql://localhost:5432/mosia_dev\" DB_DEFAULT_USER=\"mosia\" DB_DEFAULT_PASSWORD=\"ttr851217\" sbt run)",
+      "Bash(timeout 10 sbt run)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(gtimeout:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
