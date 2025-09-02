@@ -4,14 +4,11 @@ import app.mosia.application.dto.JwtDto
 import app.mosia.core.configs.AppConfig
 import app.mosia.core.errors.UserFriendlyError.*
 import app.mosia.domain.model.input.ConnectedAccountInput
-import app.mosia.domain.model.update.UsersUpdate
-import app.mosia.domain.model.{ Accounts, Users }
-import app.mosia.infra.auth.{ AuthService, AuthServiceImpl }
-import app.mosia.infra.cache.CacheProvider
+import app.mosia.domain.model.{Accounts, Users}
+import app.mosia.infra.auth.{AuthService, AuthServiceImpl}
 import app.mosia.infra.eventbus.EventBus
-import app.mosia.infra.helpers.crypto.CryptoHelper
-import app.mosia.infra.oauth.Types.{ OAuthAccount, OAuthProviderName, OAuthState, StateRequest, Tokens }
-import app.mosia.infra.oauth.{ OAuthProviderFactory, OAuthProviderFactoryImpl, OAuthService, OAuthServiceImpl }
+import app.mosia.infra.oauth.Types.*
+import app.mosia.infra.oauth.{OAuthProviderFactory, OAuthProviderFactoryImpl, OAuthService, OAuthServiceImpl}
 import app.mosia.infra.repository.RepoModule
 import app.mosia.infra.repository.impl.RepoModuleImpl
 import sttp.model.headers.CookieWithMeta

@@ -1,39 +1,31 @@
 package app.mosia.infra.auth
 
-import app.mosia.core.configs.AppConfig
-import app.mosia.core.configs.Predefined.ScalaConfig.{ Prod, Test }
-import app.mosia.core.errors.UserFriendlyError.*
-import app.mosia.core.errors.*
 import app.mosia.application.dto.*
+import app.mosia.core.configs.AppConfig
+import app.mosia.core.errors.*
+import app.mosia.core.errors.UserFriendlyError.*
 import app.mosia.domain.model.*
 import app.mosia.domain.model.SessionResult.*
 import app.mosia.domain.model.update.UsersUpdate
-import app.mosia.infra.auth.AuthMailTemplates.*
 import app.mosia.infra.auth.Types.*
-import app.mosia.infra.features.FeatureServiceImpl
-import app.mosia.infra.dao.DaoModule
 import app.mosia.infra.eventbus.EventBus
-import app.mosia.infra.features.FeatureService
-import app.mosia.infra.helpers.crypto.CryptoHelper
-import app.mosia.infra.jwt.{ JwtService, JwtServiceImpl }
+import app.mosia.infra.features.{FeatureService, FeatureServiceImpl}
+import app.mosia.infra.jwt.{JwtService, JwtServiceImpl}
 import app.mosia.infra.mailer.Mailer.*
-import app.mosia.infra.mailer.{ MailerService, MailerServiceImpl }
-import app.mosia.infra.repository.{ RepoModule, WorkspaceUserRepo }
+import app.mosia.infra.mailer.{MailerService, MailerServiceImpl}
+import app.mosia.infra.repository.RepoModule
 import app.mosia.infra.repository.impl.RepoModuleImpl
-import app.mosia.infra.token.{ TokenService, TokenServiceImpl }
-import app.mosia.mapper.DtoMappers.*
+import app.mosia.infra.token.{TokenService, TokenServiceImpl}
 import app.mosia.mapper.DomainMappers.*
+import app.mosia.mapper.DtoMappers.*
 import app.mosia.mapper.IDConverter.*
 import sttp.model.headers.Cookie.SameSite
 import sttp.model.headers.CookieWithMeta
 import sttp.tapir.model.*
 import zio.json.*
-import zio.kafka.consumer.Consumer
-import zio.kafka.producer.Producer
-import zio.redis.Redis
-import zio.{ Duration, Ref, Task, ZEnvironment, ZIO, ZLayer }
+import zio.{Duration, Ref, Task, ZEnvironment, ZIO, ZLayer}
 
-import java.time.{ Instant, OffsetDateTime }
+import java.time.{Instant, OffsetDateTime}
 import java.util.UUID
 import javax.sql.DataSource
 import scala.util.Try

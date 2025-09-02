@@ -6,10 +6,9 @@ import app.mosia.domain.model.UserFeatures
 import app.mosia.infra.auth.Types.EarlyAccessType
 import app.mosia.infra.eventbus.EventBus
 import app.mosia.infra.features.UserFeatures.FeaturesName.*
-import app.mosia.infra.helpers.crypto.CryptoHelper
 import app.mosia.infra.repository.RepoModule
 import app.mosia.infra.repository.impl.RepoModuleImpl
-import zio.{ RIO, Ref, Task, ZIO, ZLayer }
+import zio.*
 
 import java.util.UUID
 import javax.sql.DataSource

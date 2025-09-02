@@ -5,7 +5,6 @@ import app.mosia.core.errors.UserFriendlyError.*
 import app.mosia.infra.eventbus.EventBus
 import app.mosia.infra.events.ConfigEvent
 import app.mosia.infra.helpers.crypto.CryptoUtils.*
-import org.mindrot.jbcrypt.BCrypt
 import zio.{ Ref, Task, UIO, ZIO, ZLayer }
 
 import java.security.{ MessageDigest, SecureRandom }
@@ -23,17 +22,19 @@ private case class CryptoHelperImpl(
     for {
       _      <- initProvider
       config <- configRef.get
-      // 从配置中获取私钥，如果不存在则生成新的
 
-      privateKey <- ZIO
-                      .fromOption(config.crypto.privateKey)
-                      .orElse(CryptoUtils.generatePrivateKey())
-                      .tapError(e => ZIO.logError(s"Failed to get or generate private key: ${e.getMessage}"))
+//      privateKey <- ZIO
+//                      .fromOption(config.crypto.privateKey)
+//                      .orElse(CryptoUtils.generatePrivateKey())
+//                      .tapError(e => ZIO.logError(s"Failed to get or generate private key: ${e.getMessage}"))
+      privateKey <- CryptoUtils.generatePrivateKey()
 
+      _ <- ZIO.logInfo(s"privateKey: $privateKey")
       // 从私钥生成公钥
       publicKey <- CryptoUtils
                      .generatePublicKey(privateKey)
                      .tapError(e => ZIO.logError(s"Failed to generate public key: ${e.getMessage}"))
+
 
       // 生成 SHA256 密钥
       sha256PublicKey  <- sha256(publicKey)
@@ -143,16 +144,6 @@ private case class CryptoHelperImpl(
       random.nextBytes(bytes)
       bytes
     }
-
-//  override def randomInt(min: Int, max: Int): Task[Int] =
-//    ZIO.attempt {
-//      random.nextInt(max - min) + min
-//    }
-
-//  override def otp(length: Int = 6): Task[String] =
-//    for {
-//      digits <- ZIO.foreach((1 to length).toList)(_ => randomInt(0, 9))
-//    } yield digits.mkString
 
   override def sha256(data: String): Task[Array[Byte]] =
     ZIO.attempt {

@@ -27,7 +27,7 @@ object CryptoUtils {
 
   def generatePrivateKey(): Task[String] =
     for {
-//      _      <- initProvider
+      _      <- initProvider
       result <- ZIO.attempt {
                   // 获取密钥对生成器
                   val keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC")
@@ -52,7 +52,7 @@ object CryptoUtils {
 
   def generatePublicKey(privateKeyPem: String): Task[String] =
     for {
-//      _      <- initProvider
+      _      <- initProvider
       result <- ZIO.attempt {
                   // 验证输入格式
                   if (!validatePemFormat(privateKeyPem, "RSA PRIVATE KEY"))
@@ -99,7 +99,7 @@ object CryptoUtils {
                   s"""-----BEGIN PUBLIC KEY-----
                      |$base64
                      |-----END PUBLIC KEY-----""".stripMargin
-                }.tapError(_ => ZIO.logError("Failed to generate public key"))
+                }.tapError(_ => ZIO.logError("Failed to generate public key in def"))
                   .tap(_ => ZIO.logDebug("Successfully generated public key from private key"))
     } yield result
 

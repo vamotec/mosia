@@ -4,7 +4,6 @@ import app.mosia.core.configs.AppConfig
 import app.mosia.infra.oauth.Types.*
 import app.mosia.infra.cache.{ CacheProvider, CacheProviderImpl, CacheSetOptions }
 import app.mosia.infra.eventbus.EventBus
-import app.mosia.infra.helpers.crypto.CryptoHelper
 import zio.redis.RedisError
 import zio.{ durationInt, IO, Ref, Task, ZIO, ZLayer }
 

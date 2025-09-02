@@ -1,10 +1,9 @@
 package app.mosia.core.kafka
 
 import app.mosia.core.configs.AppConfig
-import zio.*
-import zio.kafka.consumer.Consumer.{ AutoOffsetStrategy, OffsetRetrieval }
-import zio.kafka.consumer.{ Consumer, ConsumerSettings }
-import zio.kafka.producer.{ Producer, ProducerSettings }
+import zio.kafka.consumer.Consumer.{AutoOffsetStrategy, OffsetRetrieval}
+import zio.kafka.consumer.{Consumer, ConsumerSettings}
+import zio.kafka.producer.{Producer, ProducerSettings}
 // 创建统一的 Kafka 配置层
 object KafkaLayers {
   def producerLayer: ZLayer[Ref[AppConfig], Throwable, Producer] =

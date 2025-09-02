@@ -3,7 +3,7 @@ package app.mosia.infra.helpers.crypto
 import app.mosia.infra.helpers.crypto.CryptoUtils.NONCE_LENGTH
 import zio.*
 
-trait CryptoHelper {
+trait CryptoHelper:
   def init(): Task[Unit]
   def sign(data: String): Task[String]
   def verify(signatureWithData: String): Task[Boolean]
@@ -17,4 +17,3 @@ trait CryptoHelper {
   def registerListeners(): UIO[Unit]
   def isValidEmail(email: String): Task[Boolean]
   def isValidPassword(password: String): Task[Boolean]
-}

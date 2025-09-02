@@ -1,15 +1,12 @@
 package app.mosia.infra.jwt
 
-import app.mosia.application.dto.{JwtPayload, UserResponseDto}
+import app.mosia.application.dto.JwtPayload
 import app.mosia.core.configs.AppConfig
 import app.mosia.core.errors.*
 import app.mosia.domain.model.Users
-import app.mosia.infra.helpers.crypto.CryptoUtils
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import zio.*
 import zio.json.*
-
-import scala.util.{Failure, Success, Try}
 
 case class JwtServiceImpl(secret: String) extends JwtService:
   def generateToken(user: Users): Task[String] = ZIO.attempt:
@@ -36,9 +33,5 @@ object JwtServiceImpl:
     for
       ref <- ZIO.service[Ref[AppConfig]]
       cfg <- ref.get
-      jwtKey <- ZIO
-        .fromOption(cfg.crypto.jwtKey)
-        .orElse(CryptoUtils.generatePrivateKey())
-        .tapError(e => ZIO.logError(s"Failed to get or generate jwt key: ${e.getMessage}"))
-    yield new JwtServiceImpl(jwtKey)
+    yield new JwtServiceImpl(cfg.crypto.jwtKey)
 
