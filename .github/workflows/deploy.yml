@@ -123,8 +123,8 @@ jobs:
 
       - name: Build application
         run: |
-          # 使用 docker-compose 构建镜像
-          docker-compose build mosia-api
+          # 使用 docker compose 构建镜像
+          docker compose build mosia-api
           
           # 标记版本
           docker tag mosia/backend-api:latest myapp:${{ github.sha }}
@@ -177,9 +177,9 @@ jobs:
             # 更新 docker-compose 中的镜像版本
             sed -i 's/image: mosia\/backend-api:.*/image: myapp:${{ github.sha }}/' docker-compose.yml
             
-            # 重新部署使用 docker-compose
-            docker-compose down
-            docker-compose up -d
+            # 重新部署使用 docker compose
+            docker compose down
+            docker compose up -d
             
             # 健康检查和部署验证
             echo "⏳ 等待服务启动..."
@@ -195,18 +195,18 @@ jobs:
                 if [ $i -eq 5 ]; then
                   echo "❌ 健康检查最终失败！"
                   echo "📋 容器状态:"
-                  docker-compose ps
+                  docker compose ps
                   echo "📋 应用日志:"
-                  docker-compose logs --tail=50 mosia-api
+                  docker compose logs --tail=50 mosia-api
                   echo "📋 所有服务状态:"
-                  docker-compose logs --tail=20
+                  docker compose logs --tail=20
                   echo "📋 系统资源:"
                   df -h && free -h
                   
                   # 自动回滚
                   echo "🔄 尝试回滚到备份配置..."
                   cp .env.backup-* .env 2>/dev/null || true
-                  docker-compose restart mosia-api
+                  docker compose restart mosia-api
                   sleep 10
                   
                   if curl -f -s http://localhost:3010/health; then
