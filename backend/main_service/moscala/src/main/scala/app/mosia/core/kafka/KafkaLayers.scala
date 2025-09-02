@@ -1,6 +1,7 @@
 package app.mosia.core.kafka
 
 import app.mosia.core.configs.AppConfig
+import zio.*
 import zio.kafka.consumer.Consumer.{AutoOffsetStrategy, OffsetRetrieval}
 import zio.kafka.consumer.{Consumer, ConsumerSettings}
 import zio.kafka.producer.{Producer, ProducerSettings}
