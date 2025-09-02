@@ -138,6 +138,15 @@ jobs:
 
       - name: Deploy to server
         run: |
+          # 验证部署变量
+          if [ -z "${{ secrets.DEPLOY_PATH }}" ] || [ -z "${{ secrets.DEPLOY_USER }}" ] || [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "❌ 缺少必要的部署变量:"
+            echo "DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}"
+            echo "DEPLOY_USER: ${{ secrets.DEPLOY_USER }}"
+            echo "DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}"
+            exit 1
+          fi
+          
           # 复制配置和应用到服务器
           scp -i ~/.ssh/deploy_key -P ${{ secrets.DEPLOY_PORT || '22' }} \
               .env \
@@ -165,31 +174,30 @@ jobs:
               
           # 在服务器上部署
           ssh -i ~/.ssh/deploy_key -P ${{ secrets.DEPLOY_PORT || '22' }} \
-              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF' || {
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+              "cd ${{ secrets.DEPLOY_PATH }} && \
+               cp .env .env.backup-\$(date +%Y%m%d-%H%M%S) 2>/dev/null || true && \
+               sed -i 's/image: mosia\/backend-api:.*/image: myapp:${{ github.sha }}/' docker-compose.yml && \
+               docker compose down && \
+               docker compose up -d && \
+               echo '⏳ 等待服务启动...' && \
+               sleep 15" || {
                 echo "❌ 部署执行失败"
                 exit 1
               }
-            cd ${{ secrets.DEPLOY_PATH }}
-            
-            # 备份当前配置
-            cp .env .env.backup-\$(date +%Y%m%d-%H%M%S) 2>/dev/null || true
-            
-            # 更新 docker-compose 中的镜像版本
-            sed -i 's/image: mosia\/backend-api:.*/image: myapp:${{ github.sha }}/' docker-compose.yml
-            
-            # 重新部署使用 docker compose
-            docker compose down
-            docker compose up -d
-            
-            # 健康检查和部署验证
-            echo "⏳ 等待服务启动..."
-            sleep 15
-            
+              
+          # 健康检查
+          ssh -i ~/.ssh/deploy_key -P ${{ secrets.DEPLOY_PORT || '22' }} \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF' || {
+                echo "❌ 健康检查失败"
+                exit 1
+              }
             # 多次尝试健康检查
             for i in {1..5}; do
               if curl -f -s http://localhost:3010/health; then
                 echo "✅ 第 $i 次健康检查成功"
-                break
+                echo "🎉 部署完成且服务健康！"
+                exit 0
               else
                 echo "⚠️ 第 $i 次健康检查失败，等待5秒后重试..."
                 if [ $i -eq 5 ]; then
@@ -219,6 +227,4 @@ jobs:
                 sleep 5
               fi
             done
-            
-            echo "🎉 部署完成且服务健康！"
           EOF
