@@ -26,7 +26,8 @@
       "mcp__serena__list_dir",
       "mcp__serena__read_file",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

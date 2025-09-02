@@ -4,6 +4,7 @@ import app.mosia.application.dto.{JwtPayload, UserResponseDto}
 import app.mosia.core.configs.AppConfig
 import app.mosia.core.errors.*
 import app.mosia.domain.model.Users
+import app.mosia.infra.helpers.crypto.CryptoUtils
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import zio.*
 import zio.json.*
@@ -35,5 +36,9 @@ object JwtServiceImpl:
     for
       ref <- ZIO.service[Ref[AppConfig]]
       cfg <- ref.get
-    yield new JwtServiceImpl(cfg.crypto.jwtKey)
+      jwtKey <- ZIO
+        .fromOption(cfg.crypto.jwtKey)
+        .orElse(CryptoUtils.generatePrivateKey())
+        .tapError(e => ZIO.logError(s"Failed to get or generate jwt key: ${e.getMessage}"))
+    yield new JwtServiceImpl(jwtKey)
 
