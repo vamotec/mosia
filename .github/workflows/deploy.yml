@@ -178,8 +178,8 @@ jobs:
               "cd ${{ secrets.DEPLOY_PATH }} && \
                cp .env .env.backup-\$(date +%Y%m%d-%H%M%S) 2>/dev/null || true && \
                sed -i 's/image: mosia\/backend-api:.*/image: myapp:${{ github.sha }}/' docker-compose.yml && \
-               docker compose down && \
-               docker compose up -d && \
+               docker-compose down && \
+               docker-compose up -d && \
                echo '⏳ 等待服务启动...' && \
                sleep 15" || {
                 echo "❌ 部署执行失败"
@@ -203,18 +203,18 @@ jobs:
                 if [ $i -eq 5 ]; then
                   echo "❌ 健康检查最终失败！"
                   echo "📋 容器状态:"
-                  docker compose ps
+                  docker-compose ps
                   echo "📋 应用日志:"
-                  docker compose logs --tail=50 mosia-api
+                  docker-compose logs --tail=50 mosia-api
                   echo "📋 所有服务状态:"
-                  docker compose logs --tail=20
+                  docker-compose logs --tail=20
                   echo "📋 系统资源:"
                   df -h && free -h
                   
                   # 自动回滚
                   echo "🔄 尝试回滚到备份配置..."
                   cp .env.backup-* .env 2>/dev/null || true
-                  docker compose restart mosia-api
+                  docker-compose restart mosia-api
                   sleep 10
                   
                   if curl -f -s http://localhost:3010/health; then
