@@ -4,10 +4,7 @@ import app.mosia.application.dto.*
 import app.mosia.domain.model.Email.Email
 import sttp.model.headers.CookieWithMeta
 import sttp.tapir.model.ServerRequest
-import zio.{ RIO, Task }
-
-import java.util.UUID
-import javax.sql.DataSource
+import zio.*
 
 trait AuthController:
   def signUp(request: ServerRequest, credential: CreateUserDto): Task[(JwtDto, List[CookieWithMeta])]

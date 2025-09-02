@@ -1,6 +1,7 @@
 package app.mosia.infra.cache
 
-import app.mosia.core.redis.{ RedisLayer, RedisPrefix }
+import app.mosia.core.configs.AppConfig
+import app.mosia.core.redis.{RedisLayer, RedisPrefix}
 import zio.*
 import zio.redis.Redis
 
@@ -20,4 +21,4 @@ object CacheProviderImpl:
         event = CacheNamespaceImpl(RedisPrefix("event:"), redis)
       )
 
-  val cacheCombine: ZLayer[Any, Throwable, CacheProvider] = RedisLayer.singleNode >>> CacheProviderImpl.live
+  val cacheCombine: ZLayer[Ref[AppConfig], Throwable, CacheProvider] = RedisLayer.singleNode >>> CacheProviderImpl.live

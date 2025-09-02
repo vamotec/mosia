@@ -7,9 +7,6 @@ CREATE TYPE WorkspaceMemberSource AS ENUM ('Email', 'Link');
 CREATE DOMAIN MOSIAJSON AS JSON;
 CREATE DOMAIN MOSIAJSONB AS JSONB;
 
--- CreateExtension
-CREATE EXTENSION IF NOT EXISTS vector;
-
 -- CreateTable
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

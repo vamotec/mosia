@@ -1,18 +1,16 @@
 package app.mosia.interface.http.controllers.auth
 
 import app.mosia.application.dto.*
-import app.mosia.core.configs.{ AppConfig, Env }
+import app.mosia.core.configs.{AppConfig, Env}
 import app.mosia.core.errors.UserFriendlyError.*
-import app.mosia.domain.model.{ CurrentUser, Email }
 import app.mosia.domain.model.Email.Email
-import app.mosia.domain.model.update.UsersUpdate
+import app.mosia.domain.model.{CurrentUser, Email}
 import app.mosia.infra.auth.Types.sessionCookieName
-import app.mosia.infra.auth.{ AuthService, AuthServiceImpl }
-import app.mosia.infra.cache.{ CacheProvider, CacheProviderImpl, CacheSetOptions }
+import app.mosia.infra.auth.{AuthService, AuthServiceImpl}
+import app.mosia.infra.cache.{CacheProvider, CacheProviderImpl, CacheSetOptions}
 import app.mosia.infra.eventbus.EventBus
-import app.mosia.infra.helpers.crypto.CryptoHelper
-import app.mosia.infra.helpers.url.{ URLHelper, URLHelperImpl }
-import app.mosia.infra.jwt.{ JwtService, JwtServiceImpl }
+import app.mosia.infra.helpers.url.{URLHelper, URLHelperImpl}
+import app.mosia.infra.jwt.{JwtService, JwtServiceImpl}
 import app.mosia.infra.repository.RepoModule
 import app.mosia.infra.repository.impl.RepoModuleImpl
 import app.mosia.infra.token.TokenType
@@ -23,7 +21,6 @@ import zio.*
 import zio.json.EncoderOps
 
 import java.security.SecureRandom
-import java.util.UUID
 import javax.sql.DataSource
 import scala.util.Try
 
@@ -36,7 +33,7 @@ case class AuthControllerImpl(
   jwt: JwtService
 ) extends AuthController:
   import AuthControllerImpl.*
-
+  
   override def signIn(
     request: ServerRequest,
     credential: OptionLoginDto,

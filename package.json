@@ -10,16 +10,18 @@
     "url": "https://github.com/vamotec/mosia.git"
   },
   "scripts": {
-    "dev": "make dev",
-    "dev:stop": "make dev-stop",
-    "dev:logs": "make logs",
+    "help": "make help",
     "env:setup": "make env-setup",
-    "env:validate": "make env-validate",
     "build": "make build",
-    "test": "make test",
-    "format": "make format",
-    "monitor": "make monitor",
+    "up": "make up",
+    "down": "make down",
+    "restart": "make restart",
+    "logs": "make logs",
+    "logs:all": "make logs-all",
     "status": "make status",
+    "sbt": "make sbt",
+    "test": "make test",
+    "deploy": "make deploy",
     "clean": "make clean"
   },
   "engines": {

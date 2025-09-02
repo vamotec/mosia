@@ -1,6 +1,6 @@
 package app.mosia.interface.http.endpoints
 
-import app.mosia.application.dto.JwtDto
+import app.mosia.application.dto.*
 import app.mosia.core.errors.ErrorResponse
 import app.mosia.interface.http.api.OAuthApi
 import app.mosia.interface.http.controllers.ControllerModule
@@ -9,8 +9,8 @@ import sttp.tapir.json.zio.jsonBody
 import sttp.tapir.model.ServerRequest
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.ztapir.*
-import sttp.tapir.{ endpoint, extractFromRequest }
-import zio.{ Task, ZIO, ZLayer }
+import sttp.tapir.{endpoint, extractFromRequest}
+import zio.{Task, ZIO, ZLayer}
 
 case class OAuthEndpoint(controller: ControllerModule) extends OAuthApi:
   override def endpoints: List[ServerEndpoint[ZioStreams, Task]] =

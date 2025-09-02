@@ -8,5 +8,6 @@ import zio.Task
 object RestEndpoints:
   def make(
     authApi: AuthApi,
-    oAuthApi: OAuthApi
-  ): List[ServerEndpoint[ZioStreams, Task]] = authApi.endpoints ++ oAuthApi.endpoints
+    oAuthApi: OAuthApi,
+    healthApi: HealthApi
+  ): List[ServerEndpoint[ZioStreams, Task]] = authApi.endpoints ++ oAuthApi.endpoints ++ healthApi.endpoints

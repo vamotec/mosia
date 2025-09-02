@@ -6,7 +6,8 @@ import zio.*
 
 final case class ApiModule(
   authApi: AuthApi,
-  oAuthApi: OAuthApi
+  oAuthApi: OAuthApi,
+  healthApi: HealthApi
 )
 
 object ApiModule:
@@ -14,5 +15,6 @@ object ApiModule:
     ZLayer.fromFunction: (controller: ControllerModule) =>
       ApiModule(
         new AuthEndpoint(controller),
-        new OAuthEndpoint(controller)
+        new OAuthEndpoint(controller),
+        new HealthEndpoint(controller)
       )

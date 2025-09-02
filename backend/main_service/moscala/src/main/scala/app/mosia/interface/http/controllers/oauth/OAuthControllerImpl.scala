@@ -27,6 +27,7 @@ case class OAuthControllerImpl(
   repo: RepoModule,
   factory: OAuthProviderFactory
 ) extends OAuthController:
+  
   override def preflight(
     unknownProviderName: Option[String] = None,
     redirectUri: Option[String] = None,

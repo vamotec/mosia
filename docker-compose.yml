@@ -1,0 +1,129 @@
+services:
+  # Mosia Backend API
+  mosia-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mosia/backend-api:latest
+    container_name: mosia-app
+    ports:
+      - "${API_PORT:-3010}:3010"
+      - "${GRPC_PORT:-9090}:9090"
+    environment:
+      # 从 .env 文件读取环境变量
+      - NODE_ENV=${NODE_ENV:-production}
+      - SERVER_PORT=3010
+      - SERVER_HOST=0.0.0.0
+      - DB_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-mosia_dev}
+      - DB_USER=${DB_USER:-mosia}
+      - DB_PASSWORD=${DB_PASSWORD:-ttr851217}
+      - DB_NAME=${DB_NAME:-mosia_dev}
+      - DB_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVER=kafka:29092
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FORMAT=json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - mosia-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:17-alpine
+    container_name: mosia-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-mosia_dev}
+      POSTGRES_USER: ${DB_USER:-mosia}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ttr851217}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/main_service/moscala/src/main/resources/db/migration:/docker-entrypoint-initdb.d
+    networks:
+      - mosia-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-mosia} -d ${DB_NAME:-mosia_dev}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: mosia-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mosia-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper (Kafka 依赖)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: mosia-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - mosia-network
+    restart: unless-stopped
+
+  # Kafka 消息队列
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: mosia-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - mosia-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  mosia-network:
+    driver: bridge

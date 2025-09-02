@@ -15,8 +15,6 @@ import sttp.tapir.ztapir.*
 import zio.json.DecoderOps
 import zio.{ Task, ZIO, ZLayer }
 
-import java.util.UUID
-
 case class AuthEndpoint(controller: ControllerModule) extends AuthApi:
   override def endpoints: List[ServerEndpoint[ZioStreams, Task]] =
     List(checkEmailEndpoint, signInEndpoint, signUpEndpoint, signOutEndpoint, sessionsEndpoint, magicLinkEndpoint)
@@ -116,6 +114,16 @@ case class AuthEndpoint(controller: ControllerModule) extends AuthApi:
           .magicLinkSignIn(request, credential)
           .mapError(err => ErrorResponse("magicLinkFailed", err.getMessage))
       }
+
+//  private val healthCheckEndpoint: ServerEndpoint[ZioStreams, Task] =
+//    endpoint.get
+//      .in("api" / "health")
+//      .out(jsonBody[String])
+//      .zServerLogic { _ =>
+//        controller.authController
+//          .healthCheck()
+//          .mapBoth(e => s"Health check failed: $e", response => response)
+//      }
 
 object AuthEndpoint:
   val live: ZLayer[ControllerModule, Nothing, AuthEndpoint] =

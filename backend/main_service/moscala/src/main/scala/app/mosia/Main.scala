@@ -3,10 +3,9 @@ package app.mosia
 import app.mosia.core.configs.AppConfig
 import app.mosia.core.kafka.KafkaLayers
 import app.mosia.grpc.greeting.ZioGreeting.Greeter
-import app.mosia.infra.auth.AuthServiceImpl
 import app.mosia.infra.context.UserContext
 import app.mosia.infra.dao.impl.QuillContext.dataSourceLayer
-import app.mosia.infra.eventbus.{ EventBus, EventBusImpl }
+import app.mosia.infra.eventbus.{EventBus, EventBusImpl}
 import app.mosia.infra.helpers.extractor.CurrentUserExtractorImpl
 import app.mosia.infra.jwt.JwtServiceImpl
 import app.mosia.interface.grpc.GreeterImpl
@@ -15,13 +14,13 @@ import app.mosia.interface.http.controllers.ControllerModuleImpl
 import app.mosia.interface.http.endpoints.RestEndpoints
 import app.mosia.interface.middleware.*
 import io.grpc.protobuf.services.ProtoReflectionService
-import scalapb.zio_grpc.{ Server as GrpcServer, ServerLayer, ServiceList }
+import scalapb.zio_grpc.{ServerLayer, ServiceList, Server as GrpcServer}
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import zio.*
-import zio.http.{ Server as HttpServer, * }
+import zio.http.{Server as HttpServer, *}
 import zio.config.typesafe.TypesafeConfigProvider
-import zio.http.Middleware.{ cors, CorsConfig }
+import zio.http.Middleware.{CorsConfig, cors}
 import zio.kafka.consumer.Consumer
 import zio.kafka.producer.Producer
 import zio.logging.backend.SLF4J
@@ -45,7 +44,7 @@ object Main extends ZIOAppDefault:
     )
 
   // 读取配置信息，设置服务器地址及端口
-  private val httpServerConfigLayer =
+  private val httpServerConfigLayer: ZLayer[Ref[AppConfig], Nothing, HttpServer.Config] =
     ZLayer.fromZIO:
       for
         appConfig <- ZIO.service[Ref[AppConfig]]
@@ -88,9 +87,10 @@ object Main extends ZIOAppDefault:
     for {
       apiModule        <- ZIO.service[ApiModule]
       restEndpoints     = RestEndpoints.make(
-                            apiModule.authApi,
-                            apiModule.oAuthApi
-                          )
+        apiModule.authApi,
+        apiModule.oAuthApi,
+        apiModule.healthApi
+      )
       businessEndpoints = restEndpoints
       docEndpoints      =
         SwaggerInterpreter().fromServerEndpoints(businessEndpoints, "Caliban tapir playground", "1.0")

@@ -1,13 +1,14 @@
 package app.mosia.infra.jwt
 
-import app.mosia.application.dto.{ JwtPayload, UserResponseDto }
+import app.mosia.application.dto.{JwtPayload, UserResponseDto}
+import app.mosia.core.configs.AppConfig
 import app.mosia.core.errors.*
 import app.mosia.domain.model.Users
-import pdi.jwt.{ Jwt, JwtAlgorithm, JwtClaim }
+import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import zio.*
 import zio.json.*
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 case class JwtServiceImpl(secret: String) extends JwtService:
   def generateToken(user: Users): Task[String] = ZIO.attempt:
@@ -30,5 +31,9 @@ case class JwtServiceImpl(secret: String) extends JwtService:
           .mapError(error => MalformedTokenError(s"Failed to decode payload: $error"))
 
 object JwtServiceImpl:
-  val live: ZLayer[Any, Nothing, JwtService] =
-    ZLayer.succeed(JwtServiceImpl("your-secret-key")) // 实际使用中应该从配置读取
+  val live: ZLayer[Ref[AppConfig], Nothing, JwtService] = ZLayer.fromZIO:
+    for
+      ref <- ZIO.service[Ref[AppConfig]]
+      cfg <- ref.get
+    yield new JwtServiceImpl(cfg.crypto.jwtKey)
+

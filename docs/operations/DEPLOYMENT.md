@@ -8,7 +8,7 @@ Scala 后端使用 JAR 文件部署，基础设施使用 Docker。
 
 ```bash
 # 启动基础设施（PostgreSQL, Redis, Kafka）
-docker-compose -f docker-compose.infrastructure.yml up -d
+docker-compose -f docker-compose.dev.yml up -d
 
 # 编译并运行 Scala 应用
 cd backend/main_service/moscala

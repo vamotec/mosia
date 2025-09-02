@@ -17,7 +17,8 @@ case class AppConfig(
   crypto: CryptoConfig,
   kafka: KafkaConfig,
   mailer: MailerConfig,
-  flags: FlagsConfig
+  flags: FlagsConfig,
+  redis: RedisConf,
 ) derives JsonCodec
 
 object AppConfig:
@@ -34,6 +35,3 @@ object AppConfig:
       _          = Env.version = BuildInfo.version
     yield configRef
   )
-
-  given JsonEncoder[RedisConfig] = DeriveJsonEncoder.gen[RedisConfig]
-  given JsonDecoder[RedisConfig] = DeriveJsonDecoder.gen[RedisConfig]
