@@ -1,0 +1,111 @@
+import Dependencies.*
+import sbtassembly.AssemblyPlugin.autoImport.*
+
+import scala.collection.Seq
+
+ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / sbtVersion := "1.11.6"
+ThisBuild / organization := "app.mosia"
+ThisBuild / name := "main"
+ThisBuild / fork := true
+ThisBuild / scalacOptions ++= Seq(
+  "-Ydebug", // 启用调试输出
+  "-Xmax-inlines:64",
+  "-deprecation"
+)
+def settingsApp = Seq(
+  name := "main",
+  scalaVersion := "3.3.6",
+  Compile / run / mainClass := Option("app.mosia.Main"),
+  testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
+  assembly / assemblyJarName := "moscala.jar",
+  assembly / test := {},
+  assembly / assemblyMergeStrategy := {
+    case PathList("META-INF", "services", _*) => MergeStrategy.concat
+    case PathList("META-INF", "io.netty.versions.properties") =>
+      MergeStrategy.first
+    case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+    case PathList(
+    "META-INF",
+    "maven",
+    "org.webjars",
+    "swagger-ui",
+    "pom.properties"
+    ) =>
+      MergeStrategy.singleOrError
+    case PathList("META-INF", "resources", "webjars", "swagger-ui", _*) =>
+      MergeStrategy.singleOrError
+    case PathList("META-INF", _*)           => MergeStrategy.discard
+    case "reference.conf"                   => MergeStrategy.concat
+    case "application.conf"                 => MergeStrategy.concat
+    case "module-info.class"                => MergeStrategy.discard
+    case x if x.endsWith("LICENSE-2.0.txt") => MergeStrategy.first
+    case _                                  => MergeStrategy.first
+  },
+  Compile / PB.targets := Seq(
+    scalapb.gen(grpc = true) -> (Compile / sourceManaged).value / "scalapb",
+    scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value / "scalapb"
+  ),
+  libraryDependencies ++= Seq(
+    zioHttp,
+    zioTest,
+    zioJson,
+    zioTestSBT,
+    zioTestMagnolia,
+    zioConfig,
+    zioSchema,
+    zioSchemaPro,
+    zioSchemaJson,
+    zioConfigTypesafe,
+    zioConfigMagnolia,
+    zioLogging,
+    zioSlf4j,
+    zioJwt,
+    calibanCore,
+    calibanTapir,
+    calibanZioHttp,
+    quillZio,
+    postgres,
+    tapir,
+    tapirZio,
+    tapirZioHttp,
+    tapirSwagger,
+    tapirZioJson,
+    sttpClient,
+    sttpZio,
+    zioRedis,
+    tika,
+    log,
+    stripe,
+    kafka,
+    sjMail,
+    scalatags,
+    crypto,
+    bcrypt,
+    chimney,
+    lombok,
+    flywayDp,
+    flyPostgres,
+    zingRpc,
+    gRpcScalapb
+  )
+)
+
+lazy val root = (project in file("."))
+  .enablePlugins(
+    JavaAppPackaging,
+    BuildInfoPlugin,
+    AssemblyPlugin,
+    ScalafmtPlugin
+  )
+  .settings(settingsApp)
+
+buildInfoKeys := Seq[BuildInfoKey](
+  name,
+  version,
+  scalaVersion,
+  sbtVersion
+)
+buildInfoPackage := "app.mosia.build"
+buildInfoObject := "BuildInfo"

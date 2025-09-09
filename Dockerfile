@@ -14,14 +14,14 @@ RUN apt-get update && \
 WORKDIR /app
 
 # 复制 SBT 配置文件 (利用缓存)
-COPY backend/main_service/moscala/project/ ./project/
-COPY backend/main_service/moscala/build.sbt ./
+COPY backend/main/project/ ./project/
+COPY backend/main/build.sbt ./
 
 # 预下载依赖 (缓存层)
 RUN sbt update
 
 # 复制源代码
-COPY backend/main_service/moscala/src/ ./src/
+COPY backend/main/src/ ./src/
 
 # 构建应用
 RUN sbt clean compile assembly
@@ -35,13 +35,13 @@ WORKDIR /app
 RUN useradd -r -s /bin/false mosia
 
 # 从构建阶段复制JAR文件
-COPY --from=builder /app/target/scala-*/moscala.jar ./moscala.jar
+COPY --from=builder /app/target/scala-*/main.jar ./main.jar
 
 # 安装 curl 用于健康检查
 RUN apt-get update && apt-get install -y curl && apt-get clean
 
 # 设置权限
-RUN chown mosia:mosia moscala.jar
+RUN chown mosia:mosia main.jar
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
@@ -54,4 +54,4 @@ EXPOSE 3010 9090
 USER mosia
 
 # 启动应用
-CMD ["java", "-Xms512m", "-Xmx1024m", "-jar", "moscala.jar"]
+CMD ["java", "-Xms512m", "-Xmx1024m", "-jar", "main.jar"]

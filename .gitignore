@@ -7,7 +7,6 @@ project/project/target/
 .bsp/
 .metals/
 .vscode/metals/
-*.log
 .cache-main
 .cache-tests
 
@@ -52,7 +51,6 @@ __pycache__/
 .Python
 env/
 venv/
-.env
 .venv
 pip-log.txt
 pip-delete-this-directory.txt

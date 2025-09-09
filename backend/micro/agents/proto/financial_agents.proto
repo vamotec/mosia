@@ -1,0 +1,1272 @@
+syntax = "proto3";
+
+package financial_agents;
+
+option java_multiple_files = true;
+option java_package = "app.mosia.grpc.financial_agents";
+option py_generic_services = true;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+// 金融AI Agents主服务
+service FinancialAgentsService {
+  // 基本面分析
+  rpc AnalyzeFundamentals(FundamentalAnalysisRequest) returns (FundamentalAnalysisResponse);
+  
+  // 技术分析
+  rpc AnalyzeTechnical(TechnicalAnalysisRequest) returns (TechnicalAnalysisResponse);
+  
+  // 风险分析
+  rpc AnalyzeRisk(RiskAnalysisRequest) returns (RiskAnalysisResponse);
+  
+  // 情绪分析
+  rpc AnalyzeSentiment(FinancialSentimentRequest) returns (FinancialSentimentResponse);
+  
+  // 宏观分析
+  rpc AnalyzeMacro(MacroAnalysisRequest) returns (MacroAnalysisResponse);
+  
+  // 交易助理
+  rpc GetTradeAdvice(TradeAdviceRequest) returns (TradeAdviceResponse);
+  
+  // 综合投资建议
+  rpc GetInvestmentAdvice(InvestmentAdviceRequest) returns (InvestmentAdviceResponse);
+  
+  // 个性化聊天
+  rpc ProcessInvestmentChat(InvestmentChatRequest) returns (InvestmentChatResponse);
+  
+  // 实时推荐流
+  rpc GetRealTimeRecommendations(RealtimeRecommendationRequest) returns (stream RecommendationUpdate);
+  
+  // 投资组合分析
+  rpc AnalyzePortfolio(PortfolioAnalysisRequest) returns (PortfolioAnalysisResponse);
+  
+  // 健康检查
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// ==================== 基本面分析 ====================
+message FundamentalAnalysisRequest {
+  string user_id = 1;
+  repeated string symbols = 2;
+  string analysis_depth = 3;    // quick|standard|deep
+  repeated string metrics = 4;  // 指定要分析的指标
+  TimeRange time_range = 5;
+  AnalysisOptions options = 6;
+}
+
+message FundamentalAnalysisResponse {
+  repeated FundamentalAnalysis results = 1;
+  string overall_assessment = 2;
+  repeated InvestmentRecommendation recommendations = 3;
+  AnalysisMetadata metadata = 4;
+}
+
+message FundamentalAnalysis {
+  string symbol = 1;
+  string company_name = 2;
+  
+  // 财务指标
+  FinancialMetrics financial_metrics = 3;
+  
+  // 行业对比
+  IndustryComparison industry_comparison = 4;
+  
+  // 估值分析
+  ValuationAnalysis valuation = 5;
+  
+  // 质量评分
+  QualityScore quality_score = 6;
+  
+  // 分析结论
+  string analysis_summary = 7;
+  InvestmentRating rating = 8;
+  
+  google.protobuf.Timestamp analyzed_at = 9;
+}
+
+message FinancialMetrics {
+  double pe_ratio = 1;
+  double pb_ratio = 2;
+  double roe = 3;
+  double roa = 4;
+  double debt_ratio = 5;
+  double current_ratio = 6;
+  double quick_ratio = 7;
+  double gross_margin = 8;
+  double operating_margin = 9;
+  double net_margin = 10;
+  double revenue_growth_yoy = 11;
+  double earnings_growth_yoy = 12;
+  double free_cash_flow = 13;
+  double dividend_yield = 14;
+  double peg_ratio = 15;
+}
+
+message IndustryComparison {
+  string industry = 1;
+  string sector = 2;
+  double industry_avg_pe = 3;
+  double industry_avg_roe = 4;
+  double relative_performance_1y = 5;
+  int32 industry_ranking = 6;
+  int32 total_companies = 7;
+  repeated CompetitorComparison competitors = 8;
+}
+
+message CompetitorComparison {
+  string competitor_symbol = 1;
+  string competitor_name = 2;
+  double relative_valuation = 3;
+  double relative_growth = 4;
+  double relative_profitability = 5;
+}
+
+message ValuationAnalysis {
+  double fair_value_dcf = 1;        // DCF估值
+  double fair_value_relative = 2;   // 相对估值
+  double current_price = 3;
+  double upside_potential = 4;
+  string valuation_method = 5;
+  double confidence_level = 6;
+  repeated AssumptionParameter assumptions = 7;
+}
+
+message AssumptionParameter {
+  string parameter_name = 1;
+  double value = 2;
+  string description = 3;
+}
+
+message QualityScore {
+  double overall_score = 1;        // 0-100
+  double financial_strength = 2;   // 财务实力
+  double management_quality = 3;   // 管理质量
+  double competitive_advantage = 4; // 竞争优势
+  double growth_prospects = 5;     // 成长前景
+  double esg_score = 6;           // ESG评分
+}
+
+// ==================== 技术分析 ====================
+message TechnicalAnalysisRequest {
+  string user_id = 1;
+  repeated string symbols = 2;
+  string timeframe = 3;         // 1m|5m|15m|1h|1d|1w|1M
+  repeated string indicators = 4; // ma|macd|rsi|bollinger|fibonacci|stoch
+  TimeRange time_range = 5;
+  AnalysisOptions options = 6;
+}
+
+message TechnicalAnalysisResponse {
+  repeated TechnicalAnalysis results = 1;
+  MarketTrend overall_trend = 2;
+  repeated TradingSignal signals = 3;
+  AnalysisMetadata metadata = 4;
+}
+
+message TechnicalAnalysis {
+  string symbol = 1;
+  double current_price = 2;
+  double price_change = 3;
+  double price_change_percent = 4;
+  
+  // 技术指标
+  map<string, TechnicalIndicator> indicators = 5;
+  
+  // 图表模式
+  repeated ChartPattern patterns = 6;
+  
+  // 支撑阻力
+  SupportResistance support_resistance = 7;
+  
+  // 趋势分析
+  TrendAnalysis trend = 8;
+  
+  // 交易信号
+  repeated TradingSignal signals = 9;
+  
+  // 成交量分析
+  VolumeAnalysis volume = 10;
+  
+  google.protobuf.Timestamp analyzed_at = 11;
+}
+
+message TechnicalIndicator {
+  string name = 1;
+  double value = 2;
+  double previous_value = 3;
+  string signal = 4;      // BUY|SELL|HOLD
+  double confidence = 5;
+  map<string, double> parameters = 6;
+  string interpretation = 7;  // 中文解读
+}
+
+message ChartPattern {
+  string pattern_type = 1;  // head_shoulders|triangle|flag|wedge|double_top|cup_handle
+  string direction = 2;     // bullish|bearish|neutral
+  double confidence = 3;
+  PriceLevel breakout_level = 4;
+  PriceLevel target_level = 5;
+  PriceLevel stop_loss = 6;
+  string description = 7;   // 模式描述
+}
+
+message SupportResistance {
+  repeated PriceLevel support_levels = 1;
+  repeated PriceLevel resistance_levels = 2;
+  PriceLevel key_support = 3;
+  PriceLevel key_resistance = 4;
+  double pivot_point = 5;
+}
+
+message PriceLevel {
+  double price = 1;
+  double strength = 2;        // 0-1，强度
+  int32 touch_count = 3;      // 触及次数
+  google.protobuf.Timestamp last_touch = 4;
+  string level_type = 5;      // psychological|fibonacci|moving_average
+}
+
+message TrendAnalysis {
+  string short_term_trend = 1;   // bullish|bearish|sideways
+  string medium_term_trend = 2;
+  string long_term_trend = 3;
+  double trend_strength = 4;     // 0-1
+  string trend_stage = 5;        // accumulation|markup|distribution|decline
+}
+
+message VolumeAnalysis {
+  double current_volume = 1;
+  double avg_volume_20d = 2;
+  double volume_ratio = 3;      // 当前/平均
+  string volume_trend = 4;      // increasing|decreasing|stable
+  string volume_pattern = 5;    // climax|accumulation|distribution
+}
+
+// ==================== 风险分析 ====================
+message RiskAnalysisRequest {
+  string user_id = 1;
+  Portfolio portfolio = 2;
+  string risk_model = 3;        // var|cvar|montecarlo|stress|sharpe
+  double confidence_level = 4;   // 0.95, 0.99
+  int32 time_horizon_days = 5;
+  repeated string stress_scenarios = 6;
+  AnalysisOptions options = 7;
+}
+
+message RiskAnalysisResponse {
+  PortfolioRisk portfolio_risk = 1;
+  repeated AssetRisk individual_risks = 2;
+  repeated RiskScenario scenarios = 3;
+  OptimizationSuggestion optimization = 4;
+  repeated RiskAlert alerts = 5;
+  AnalysisMetadata metadata = 6;
+}
+
+message Portfolio {
+  string portfolio_id = 1;
+  string user_id = 2;
+  repeated Position positions = 3;
+  double total_value = 4;
+  double cash_balance = 5;
+  string base_currency = 6;
+  map<string, double> target_allocation = 7;  // 目标配置
+}
+
+message Position {
+  string symbol = 1;
+  double quantity = 2;
+  double current_price = 3;
+  double cost_basis = 4;
+  double market_value = 5;
+  double weight = 6;           // 在组合中的权重
+  double unrealized_pnl = 7;
+  double unrealized_pnl_percent = 8;
+}
+
+message PortfolioRisk {
+  double var_1d = 1;           // 1日风险价值
+  double var_5d = 2;           // 5日风险价值
+  double var_22d = 3;          // 月风险价值
+  double cvar = 4;             // 条件风险价值
+  double expected_shortfall = 5;
+  double sharpe_ratio = 6;
+  double sortino_ratio = 7;
+  double max_drawdown = 8;
+  double volatility_annual = 9;
+  double beta = 10;
+  double alpha = 11;
+  CorrelationMatrix correlation = 12;
+  ConcentrationRisk concentration = 13;
+}
+
+message AssetRisk {
+  string symbol = 1;
+  double individual_var = 2;
+  double contribution_to_var = 3;  // 对组合VaR的贡献
+  double beta = 4;
+  double volatility = 5;
+  double liquidity_risk = 6;
+  double credit_risk = 7;
+  RiskRating risk_rating = 8;
+  double recommended_weight = 9;   // 建议权重
+}
+
+message CorrelationMatrix {
+  repeated string symbols = 1;
+  repeated CorrelationRow rows = 2;
+}
+
+message CorrelationRow {
+  repeated double correlations = 1;
+}
+
+message ConcentrationRisk {
+  double herfindahl_index = 1;     // 赫芬达尔指数
+  double max_position_weight = 2;  // 最大持仓权重
+  double top5_concentration = 3;   // 前5大持仓集中度
+  repeated ConcentrationAlert alerts = 4;
+}
+
+message ConcentrationAlert {
+  string alert_type = 1;          // sector|geography|currency|single_stock
+  double concentration_level = 2;
+  double threshold = 3;
+  string recommendation = 4;
+}
+
+message RiskScenario {
+  string scenario_name = 1;        // market_crash|rate_hike|recession|black_swan
+  double probability = 2;
+  double portfolio_impact = 3;     // 百分比影响
+  repeated AssetImpact asset_impacts = 4;
+  string description = 5;
+}
+
+message AssetImpact {
+  string symbol = 1;
+  double price_impact = 2;         // 价格影响百分比
+  double volume_impact = 3;        // 成交量影响
+  double liquidity_impact = 4;     // 流动性影响
+}
+
+message OptimizationSuggestion {
+  double suggested_var_reduction = 1;
+  repeated PositionAdjustment adjustments = 2;
+  string optimization_strategy = 3;  // mean_reversion|momentum|defensive
+  double expected_return_impact = 4;
+}
+
+message PositionAdjustment {
+  string symbol = 1;
+  string action = 2;              // increase|decrease|add|remove
+  double current_weight = 3;
+  double suggested_weight = 4;
+  string reasoning = 5;
+}
+
+message RiskAlert {
+  AlertLevel level = 1;
+  string alert_type = 2;          // concentration|var_exceeded|correlation|liquidity
+  string message = 3;
+  repeated string affected_symbols = 4;
+  string recommended_action = 5;
+}
+
+// ==================== 情绪分析 ====================
+message FinancialSentimentRequest {
+  string user_id = 1;
+  repeated string symbols = 2;
+  repeated string sources = 3;    // news|social|analyst_reports|earnings_calls
+  TimeRange time_range = 4;
+  AnalysisOptions options = 5;
+}
+
+message FinancialSentimentResponse {
+  repeated SymbolSentiment symbol_sentiments = 1;
+  MarketSentiment overall_market = 2;
+  repeated SentimentEvent events = 3;
+  SentimentTrend trend = 4;
+  AnalysisMetadata metadata = 5;
+}
+
+message SymbolSentiment {
+  string symbol = 1;
+  double sentiment_score = 2;      // -1.0 to 1.0
+  string sentiment_label = 3;     // very_negative|negative|neutral|positive|very_positive
+  double confidence = 4;
+  SentimentBreakdown breakdown = 5;
+  repeated SentimentSource sources = 6;
+  repeated string key_topics = 7;
+  SentimentChange change_24h = 8;
+}
+
+message SentimentBreakdown {
+  double news_sentiment = 1;
+  double social_sentiment = 2;
+  double analyst_sentiment = 3;
+  double earnings_sentiment = 4;
+  int32 total_mentions = 5;
+  int32 positive_mentions = 6;
+  int32 negative_mentions = 7;
+}
+
+message SentimentSource {
+  string source_type = 1;         // news|twitter|reddit|analyst_report
+  string source_name = 2;
+  double sentiment_score = 3;
+  double influence_weight = 4;    // 影响权重
+  string headline = 5;
+  google.protobuf.Timestamp published_at = 6;
+  string url = 7;
+}
+
+message MarketSentiment {
+  double fear_greed_index = 1;     // 0-100
+  string market_mood = 2;          // extreme_fear|fear|neutral|greed|extreme_greed
+  double volatility_sentiment = 3;
+  double sector_rotation_signal = 4;
+  map<string, double> sector_sentiments = 5;
+}
+
+message SentimentEvent {
+  string event_id = 1;
+  string event_type = 2;          // earnings|merger|lawsuit|regulatory|economic
+  string title = 3;
+  string description = 4;
+  repeated string affected_symbols = 5;
+  double sentiment_impact = 6;
+  double market_impact = 7;
+  google.protobuf.Timestamp event_time = 8;
+  double confidence = 9;
+}
+
+message SentimentTrend {
+  string trend_direction = 1;      // improving|deteriorating|stable
+  double momentum = 2;             // 变化动量
+  repeated SentimentDataPoint history = 3;
+  double trend_strength = 4;
+}
+
+message SentimentDataPoint {
+  google.protobuf.Timestamp timestamp = 1;
+  double sentiment_score = 2;
+  int32 volume_mentions = 3;
+}
+
+message SentimentChange {
+  double change_value = 1;
+  double change_percent = 2;
+  string change_significance = 3;  // minor|moderate|major|extreme
+}
+
+// ==================== 宏观分析 ====================
+message MacroAnalysisRequest {
+  string user_id = 1;
+  repeated string regions = 2;     // US|CN|EU|JP|GLOBAL
+  repeated string indicators = 3;  // gdp|cpi|unemployment|rates|pmi
+  TimeRange time_range = 4;
+  AnalysisOptions options = 5;
+}
+
+message MacroAnalysisResponse {
+  repeated RegionalAnalysis regional_analysis = 1;
+  GlobalEconomicOutlook global_outlook = 2;
+  repeated MacroEvent upcoming_events = 3;
+  SectorImpact sector_impacts = 4;
+  AnalysisMetadata metadata = 5;
+}
+
+message RegionalAnalysis {
+  string region = 1;
+  EconomicIndicators indicators = 2;
+  PolicyAnalysis policy = 3;
+  string economic_phase = 4;       // expansion|peak|contraction|trough
+  double growth_outlook = 5;       // 增长前景评分
+  repeated string key_risks = 6;
+  string analysis_summary = 7;
+}
+
+message EconomicIndicators {
+  double gdp_growth = 1;
+  double inflation_rate = 2;
+  double unemployment_rate = 3;
+  double interest_rate = 4;
+  double pmi_manufacturing = 5;
+  double pmi_services = 6;
+  double consumer_confidence = 7;
+  double retail_sales_growth = 8;
+  double currency_strength = 9;
+}
+
+message PolicyAnalysis {
+  string monetary_policy_stance = 1;  // dovish|neutral|hawkish
+  string fiscal_policy_stance = 2;   // expansionary|neutral|contractionary
+  repeated PolicyEvent recent_changes = 3;
+  repeated PolicyEvent upcoming_decisions = 4;
+  double policy_uncertainty_index = 5;
+}
+
+message PolicyEvent {
+  string event_type = 1;           // rate_decision|stimulus|regulation
+  string description = 2;
+  google.protobuf.Timestamp date = 3;
+  double market_impact_score = 4;
+  repeated string affected_sectors = 5;
+}
+
+message GlobalEconomicOutlook {
+  string global_growth_trend = 1;   // accelerating|stable|slowing
+  double global_growth_forecast = 2;
+  repeated string major_themes = 3; // inflation|rates|geopolitics|trade
+  double recession_probability = 4;
+  map<string, double> currency_outlook = 5; // USD|EUR|CNY|JPY
+}
+
+message SectorImpact {
+  map<string, SectorAnalysis> sectors = 1;
+}
+
+message SectorAnalysis {
+  string sector_name = 1;
+  double macro_sensitivity = 2;    // 对宏观的敏感度
+  string outlook = 3;              // positive|neutral|negative
+  repeated string key_drivers = 4;
+  repeated string key_risks = 5;
+  double recommended_allocation = 6; // 建议配置比例
+}
+
+message MacroEvent {
+  string event_name = 1;
+  google.protobuf.Timestamp scheduled_date = 2;
+  string importance = 3;           // low|medium|high|critical
+  string event_type = 4;          // data_release|central_bank|political
+  repeated string expected_impacts = 5;
+  double volatility_expected = 6;
+}
+
+// ==================== 交易助理 ====================
+message TradeAdviceRequest {
+  string user_id = 1;
+  TradeIntent trade_intent = 2;
+  Portfolio current_portfolio = 3;
+  MarketConditions market_conditions = 4;
+  AnalysisOptions options = 5;
+}
+
+message TradeAdviceResponse {
+  ExecutionStrategy execution_strategy = 1;
+  CostAnalysis cost_analysis = 2;
+  TimingAdvice timing = 3;
+  repeated RiskWarning warnings = 4;
+  AlternativeStrategies alternatives = 5;
+  AnalysisMetadata metadata = 6;
+}
+
+message TradeIntent {
+  string symbol = 1;
+  string action = 2;               // BUY|SELL
+  double target_quantity = 3;
+  double target_value = 4;         // 目标金额
+  string order_type = 5;          // market|limit|stop_loss|stop_limit
+  double limit_price = 6;
+  string urgency = 7;             // immediate|intraday|multi_day
+}
+
+message MarketConditions {
+  double current_price = 1;
+  double bid_ask_spread = 2;
+  double average_volume = 3;
+  double current_volume = 4;
+  double volatility = 5;
+  string market_phase = 6;        // pre_market|open|close|after_hours
+  double market_impact_estimate = 7;
+}
+
+message ExecutionStrategy {
+  string strategy_type = 1;       // market|vwap|twap|pov|iceberg
+  repeated ExecutionSlice slices = 2;
+  double estimated_slippage = 3;
+  double estimated_market_impact = 4;
+  string recommended_timeframe = 5;
+  string reasoning = 6;
+}
+
+message ExecutionSlice {
+  int32 slice_number = 1;
+  double quantity = 2;
+  string timing = 3;              // immediate|10min|30min|1h
+  string order_type = 4;
+  double suggested_price = 5;
+}
+
+message CostAnalysis {
+  double commission = 1;
+  double estimated_slippage = 2;
+  double market_impact = 3;
+  double opportunity_cost = 4;
+  double total_cost = 5;
+  double cost_basis_points = 6;   // 成本基点
+}
+
+message TimingAdvice {
+  string optimal_timing = 1;      // now|morning_open|afternoon|avoid
+  repeated TimeWindow good_windows = 2;
+  repeated TimeWindow avoid_windows = 3;
+  string reasoning = 4;
+  double timing_confidence = 5;
+}
+
+message TimeWindow {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  string description = 3;
+  double liquidity_score = 4;
+}
+
+message AlternativeStrategies {
+  repeated TradeAlternative alternatives = 1;
+}
+
+message TradeAlternative {
+  string strategy_name = 1;
+  string description = 2;
+  double cost_difference = 3;
+  double risk_difference = 4;
+  double execution_difficulty = 5;
+  string pros_and_cons = 6;
+}
+
+message RiskWarning {
+  AlertLevel level = 1;
+  string warning_type = 2;        // concentration|liquidity|timing|volatility
+  string message = 3;
+  string mitigation_advice = 4;
+}
+
+// ==================== 综合投资建议 ====================
+message InvestmentAdviceRequest {
+  string user_id = 1;
+  repeated string symbols = 2;     // 可选，针对特定标的
+  Portfolio current_portfolio = 3;
+  double available_cash = 4;
+  string investment_goal = 5;      // growth|income|balanced|speculation
+  TimeRange investment_horizon = 6;
+  AnalysisOptions options = 7;
+}
+
+message InvestmentAdviceResponse {
+  repeated InvestmentRecommendation recommendations = 1;
+  PortfolioOptimization optimization = 2;
+  string investment_thesis = 3;    // 投资逻辑
+  MarketOutlook market_outlook = 4;
+  RiskAssessment risk_assessment = 5;
+  string executive_summary = 6;    // 执行摘要
+  AnalysisMetadata metadata = 7;
+}
+
+message InvestmentRecommendation {
+  string symbol = 1;
+  RecommendationAction action = 2;
+  double target_price = 3;
+  double stop_loss = 4;
+  double take_profit = 5;
+  double confidence = 6;
+  string reasoning = 7;
+  repeated string supporting_factors = 8;
+  repeated string risk_factors = 9;
+  TimeFrame time_frame = 10;
+  double position_size_percent = 11; // 建议仓位比例
+  repeated AnalystContribution analyst_inputs = 12;
+}
+
+message AnalystContribution {
+  string analyst_type = 1;         // fundamental|technical|risk|sentiment|macro
+  double weight = 2;               // 该分析师在建议中的权重
+  string key_insight = 3;          // 核心洞察
+  double confidence = 4;
+}
+
+message PortfolioOptimization {
+  repeated PositionAdjustment current_adjustments = 1;
+  repeated NewPositionSuggestion new_positions = 2;
+  double expected_return_improvement = 3;
+  double risk_reduction = 4;
+  string optimization_method = 5;   // mean_variance|black_litterman|risk_parity
+}
+
+message NewPositionSuggestion {
+  string symbol = 1;
+  double suggested_allocation = 2;
+  string reasoning = 3;
+  double expected_contribution = 4; // 对组合的预期贡献
+}
+
+message MarketOutlook {
+  string short_term_outlook = 1;   // bullish|neutral|bearish
+  string medium_term_outlook = 2;
+  string long_term_outlook = 3;
+  double market_volatility_forecast = 4;
+  repeated string key_themes = 5;
+  repeated string major_risks = 6;
+}
+
+message RiskAssessment {
+  RiskRating overall_risk_rating = 1;
+  double risk_score = 2;           // 0-100，风险评分
+  repeated RiskFactor risk_factors = 3;
+  RiskProfile risk_profile = 4;
+  repeated RiskScenario stress_scenarios = 5;
+  RiskTolerance recommended_risk_tolerance = 6;
+  string risk_summary = 7;         // 风险评估摘要
+  repeated RiskMitigation mitigation_strategies = 8;
+}
+
+message RiskFactor {
+  string factor_name = 1;          // market|credit|liquidity|operational|political
+  RiskRating severity = 2;
+  double probability = 3;          // 0-1，发生概率
+  double impact = 4;               // 0-1，影响程度
+  string description = 5;
+  repeated string affected_assets = 6;
+  string mitigation_advice = 7;
+}
+
+message RiskProfile {
+  double volatility_tolerance = 1;  // 波动性容忍度
+  double max_drawdown_tolerance = 2; // 最大回撤容忍度
+  string investment_horizon = 3;    // short|medium|long
+  string risk_capacity = 4;         // low|medium|high
+  double liquidity_needs = 5;       // 流动性需求
+  map<string, double> sector_limits = 6;  // 行业限制
+  map<string, double> geography_limits = 7; // 地域限制
+}
+
+message RiskTolerance {
+  string tolerance_level = 1;       // conservative|moderate|aggressive|very_aggressive
+  double max_portfolio_volatility = 2;
+  double max_single_position = 3;   // 单一持仓最大比例
+  double max_sector_concentration = 4;
+  string recommended_strategy = 5;   // 建议策略
+}
+
+message RiskMitigation {
+  string mitigation_type = 1;       // diversification|hedging|position_sizing|timing
+  string description = 2;
+  double effectiveness = 3;         // 0-1，有效性
+  double implementation_cost = 4;
+  string implementation_steps = 5;
+}
+
+// ==================== AI聊天 ====================
+message InvestmentChatRequest {
+  string user_id = 1;
+  string session_id = 2;
+  string message = 3;
+  string context_type = 4;         // general|specific_symbol|portfolio|market
+  repeated string related_symbols = 5;
+  map<string, string> context_data = 6;
+}
+
+message InvestmentChatResponse {
+  string response = 1;
+  string session_id = 2;
+  repeated ChatAttachment attachments = 3;  // 图表、数据等
+  repeated QuickAction quick_actions = 4;   // 快速操作建议
+  repeated string follow_up_suggestions = 5;
+  PersonalizationData personalization = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message ChatAttachment {
+  string attachment_type = 1;      // chart|table|analysis|recommendation
+  string title = 2;
+  string description = 3;
+  google.protobuf.Any data = 4;   // 具体数据内容
+  string visualization_hint = 5;   // 前端如何展示的提示
+}
+
+message QuickAction {
+  string action_id = 1;
+  string action_type = 2;          // analyze|buy|sell|set_alert|add_watchlist
+  string label = 3;
+  string description = 4;
+  map<string, string> parameters = 5;
+}
+
+message PersonalizationData {
+  repeated string learned_preferences = 1;
+  double engagement_score = 2;     // 用户参与度
+  string communication_style = 3;  // formal|casual|technical|simple
+  repeated string interests = 4;
+}
+
+// ==================== 实时推荐 ====================
+message RealtimeRecommendationRequest {
+  string user_id = 1;
+  Portfolio user_portfolio = 2;
+  repeated string watchlist = 3;   // 关注列表
+  RealtimeConfig config = 4;
+}
+
+message RealtimeConfig {
+  double price_change_threshold = 1;    // 价格变动阈值
+  double volume_spike_threshold = 2;    // 成交量异常阈值
+  double news_sentiment_threshold = 3;  // 新闻情绪阈值
+  bool enable_technical_alerts = 4;
+  bool enable_fundamental_alerts = 5;
+  bool enable_risk_alerts = 6;
+  repeated string notification_channels = 7; // push|email|sms
+}
+
+message RecommendationUpdate {
+  string update_id = 1;
+  string update_type = 2;          // price_alert|news_event|technical_signal|risk_alert
+  repeated string affected_symbols = 3;
+  string title = 4;
+  string message = 5;
+  Priority priority = 6;
+  UpdateData data = 7;
+  google.protobuf.Timestamp timestamp = 8;
+  repeated QuickAction suggested_actions = 9;
+}
+
+message UpdateData {
+  oneof update_data {
+    PriceAlert price_alert = 1;
+    TechnicalSignal technical_signal = 2;
+    NewsAlert news_alert = 3;
+    RiskAlert risk_alert = 4;
+  }
+}
+
+message PriceAlert {
+  string symbol = 1;
+  double current_price = 2;
+  double price_change = 3;
+  double price_change_percent = 4;
+  string trigger_reason = 5;       // target_reached|stop_loss|resistance_break
+}
+
+message NewsAlert {
+  string headline = 1;
+  double sentiment_impact = 2;
+  string source = 3;
+  repeated string affected_symbols = 4;
+  string summary = 5;
+}
+
+message TechnicalSignal {
+  string symbol = 1;
+  string signal_type = 2;          // breakout|breakdown|reversal|continuation|divergence
+  RecommendationAction action = 3; // BUY|SELL|HOLD
+  double strength = 4;             // 0-1，信号强度
+  string indicator_name = 5;       // MA|MACD|RSI|Bollinger|Stochastic|Fibonacci
+  double current_value = 6;        // 指标当前值
+  double trigger_value = 7;        // 触发值
+  string timeframe = 8;           // 1m|5m|15m|1h|1d|1w
+  double confidence = 9;          // 0-1，置信度
+  string description = 10;        // 信号描述
+  double target_price = 11;       // 目标价位
+  double stop_loss = 12;          // 止损价位
+  google.protobuf.Timestamp signal_time = 13;
+  TechnicalContext context = 14;  // 技术背景信息
+}
+
+message TechnicalContext {
+  double current_price = 1;
+  double price_change_percent = 2;
+  double volume_ratio = 3;         // 成交量比率
+  repeated string supporting_indicators = 4; // 支撑指标
+  repeated PriceLevel key_levels = 5;        // 关键价位
+  string market_structure = 6;     // uptrend|downtrend|sideways|transition
+  double volatility_regime = 7;    // 当前波动率状态
+}
+
+// ==================== 投资组合分析 ====================
+message PortfolioAnalysisRequest {
+  string user_id = 1;
+  Portfolio portfolio = 2;
+  string analysis_type = 3;         // performance|risk|allocation|optimization|attribution
+  TimeRange time_range = 4;
+  string benchmark_symbol = 5;      // 基准指标，如 SPY、000300
+  AnalysisOptions options = 6;
+  repeated string analysis_dimensions = 7; // sector|geography|asset_class|factor
+}
+
+message PortfolioAnalysisResponse {
+  PerformanceAnalysis performance = 1;
+  PortfolioRisk risk_analysis = 2;
+  AllocationAnalysis allocation = 3;
+  AttributionAnalysis attribution = 4;
+  OptimizationSuggestions optimization = 5;
+  BenchmarkComparison benchmark_comparison = 6;
+  AnalysisMetadata metadata = 7;
+  string executive_summary = 8;        // 执行摘要
+  repeated AnalysisInsight key_insights = 9;
+}
+
+message PerformanceAnalysis {
+  double total_return = 1;             // 总回报率
+  double annualized_return = 2;        // 年化回报率
+  double ytd_return = 3;               // 年初至今回报
+  double monthly_return = 4;           // 月回报
+  double weekly_return = 5;            // 周回报
+  double daily_return = 6;             // 日回报
+  
+  // 风险调整后收益
+  double sharpe_ratio = 7;
+  double sortino_ratio = 8;
+  double treynor_ratio = 9;
+  double information_ratio = 10;
+  double calmar_ratio = 11;
+  
+  // 历史表现
+  repeated PerformancePeriod historical_performance = 12;
+  double best_month = 13;
+  double worst_month = 14;
+  double positive_months_ratio = 15;   // 正收益月份占比
+  
+  // 波动性指标
+  double volatility_annual = 16;
+  double downside_deviation = 17;
+  double max_drawdown = 18;
+  double max_drawdown_duration_days = 19;
+  google.protobuf.Timestamp max_drawdown_start = 20;
+  google.protobuf.Timestamp max_drawdown_end = 21;
+}
+
+message PerformancePeriod {
+  string period = 1;                   // 1M|3M|6M|1Y|2Y|3Y|5Y|10Y|inception
+  double return_value = 2;
+  double volatility = 3;
+  double sharpe_ratio = 4;
+  double max_drawdown = 5;
+}
+
+message AllocationAnalysis {
+  repeated AllocationBreakdown current_allocation = 1;
+  repeated AllocationBreakdown target_allocation = 2;
+  repeated AllocationBreakdown strategic_allocation = 3;
+  AllocationDrift drift_analysis = 4;
+  EfficiencyAnalysis efficiency = 5;
+  repeated DiversificationMetric diversification = 6;
+}
+
+message AllocationBreakdown {
+  string dimension = 1;                // sector|geography|asset_class|market_cap
+  map<string, double> weights = 2;     // 各类别权重
+  double concentration_ratio = 3;       // 集中度
+  int32 number_of_holdings = 4;
+  double effective_holdings = 5;        // 有效持股数量
+}
+
+message AllocationDrift {
+  map<string, DriftMeasurement> drifts = 1;
+  double total_drift_magnitude = 2;
+  repeated RebalancingNeed rebalancing_needs = 3;
+  double days_since_last_rebalance = 4;
+}
+
+message DriftMeasurement {
+  double current_weight = 1;
+  double target_weight = 2;
+  double drift_amount = 3;
+  double drift_percentage = 4;
+  bool needs_rebalancing = 5;
+  double rebalancing_threshold = 6;
+}
+
+message RebalancingNeed {
+  string asset_category = 1;
+  string action = 2;                   // buy|sell|rebalance
+  double current_weight = 3;
+  double target_weight = 4;
+  double suggested_trade_amount = 5;
+  double urgency_score = 6;            // 0-1，紧急程度
+}
+
+message EfficiencyAnalysis {
+  double tracking_error = 1;           // 跟踪误差
+  double active_share = 2;             // 主动份额
+  double r_squared = 3;                // R平方值
+  double correlation_to_benchmark = 4;
+  double active_return = 5;            // 主动收益
+  double portfolio_turnover = 6;       // 组合换手率
+}
+
+message DiversificationMetric {
+  string metric_name = 1;              // herfindahl|concentration|effective_holdings
+  double value = 2;
+  string interpretation = 3;           // 解读说明
+  double benchmark_value = 4;          // 基准值
+  string assessment = 5;               // well_diversified|moderately_diversified|concentrated
+}
+
+message AttributionAnalysis {
+  PerformanceAttribution performance_attribution = 1;
+  repeated SectorAttribution sector_attribution = 2;
+  repeated SecurityAttribution security_attribution = 3;
+  repeated FactorAttribution factor_attribution = 4;
+  ActivePassiveBreakdown active_passive = 5;
+}
+
+message PerformanceAttribution {
+  double asset_allocation_effect = 1;   // 资产配置效应
+  double security_selection_effect = 2; // 证券选择效应
+  double interaction_effect = 3;        // 交互效应
+  double timing_effect = 4;            // 时机选择效应
+  double currency_effect = 5;          // 汇率效应
+  double total_active_return = 6;      // 总主动回报
+}
+
+message SectorAttribution {
+  string sector_name = 1;
+  double portfolio_weight = 2;
+  double benchmark_weight = 3;
+  double allocation_effect = 4;
+  double selection_effect = 5;
+  double total_effect = 6;
+  double sector_return = 7;
+  double benchmark_sector_return = 8;
+}
+
+message SecurityAttribution {
+  string symbol = 1;
+  string security_name = 2;
+  double weight = 3;
+  double return_contribution = 4;
+  double active_return = 5;
+  double risk_contribution = 6;
+  string performance_category = 7;     // top_performer|underperformer|neutral
+}
+
+message FactorAttribution {
+  string factor_name = 1;              // value|growth|quality|momentum|size|volatility
+  double factor_exposure = 2;
+  double factor_return = 3;
+  double contribution_to_return = 4;
+  double active_exposure = 5;          // 相对基准的暴露度
+}
+
+message ActivePassiveBreakdown {
+  double passive_return = 1;           // 被动回报（基准回报）
+  double active_return = 2;            // 主动回报
+  double alpha = 3;                    // 超额收益
+  double beta = 4;                     // 贝塔系数
+  double systematic_risk = 5;          // 系统性风险
+  double idiosyncratic_risk = 6;       // 特异性风险
+}
+
+message OptimizationSuggestions {
+  repeated OptimizationRecommendation recommendations = 1;
+  EfficientFrontier efficient_frontier = 2;
+  RiskBudgetAnalysis risk_budget = 3;
+  string optimization_objective = 4;   // max_return|min_risk|max_sharpe|risk_parity
+  double expected_improvement = 5;     // 预期改进幅度
+}
+
+message OptimizationRecommendation {
+  string recommendation_type = 1;      // rebalance|add_position|reduce_position|diversify
+  string description = 2;
+  repeated PositionAdjustment position_changes = 3;
+  double expected_return_impact = 4;
+  double expected_risk_impact = 5;
+  double implementation_cost = 6;
+  double priority_score = 7;           // 优先级评分
+  string reasoning = 8;
+}
+
+message EfficientFrontier {
+  repeated PortfolioPoint frontier_points = 1;
+  PortfolioPoint current_portfolio = 2;
+  PortfolioPoint optimal_portfolio = 3;
+  double distance_to_frontier = 4;     // 当前组合距离有效前沿的距离
+}
+
+message PortfolioPoint {
+  double expected_return = 1;
+  double risk = 2;
+  double sharpe_ratio = 3;
+  map<string, double> weights = 4;     // 资产权重
+}
+
+message RiskBudgetAnalysis {
+  map<string, double> risk_contributions = 1;  // 各资产风险贡献
+  repeated RiskBudgetViolation violations = 2;
+  double risk_concentration = 3;       // 风险集中度
+  string risk_budget_approach = 4;     // equal_risk|strategic_risk|factor_risk
+}
+
+message RiskBudgetViolation {
+  string asset_name = 1;
+  double current_risk_contribution = 2;
+  double target_risk_contribution = 3;
+  double violation_magnitude = 4;
+  string suggested_action = 5;
+}
+
+message BenchmarkComparison {
+  string benchmark_name = 1;
+  double benchmark_return = 2;
+  double tracking_error = 3;
+  double information_ratio = 4;
+  double up_capture = 5;               // 上行捕获率
+  double down_capture = 6;             // 下行捕获率
+  BetaAnalysis beta_analysis = 7;
+  repeated PeerComparison peer_comparisons = 8;
+}
+
+message BetaAnalysis {
+  double beta = 1;
+  double alpha = 2;
+  double r_squared = 3;
+  double standard_error = 4;
+  string beta_interpretation = 5;      // defensive|neutral|aggressive
+  BearBullAnalysis bear_bull = 6;
+}
+
+message BearBullAnalysis {
+  double bear_market_beta = 1;         // 熊市贝塔
+  double bull_market_beta = 2;         // 牛市贝塔
+  double bear_market_performance = 3;   // 熊市表现
+  double bull_market_performance = 4;   // 牛市表现
+}
+
+message PeerComparison {
+  string peer_name = 1;
+  string peer_category = 2;            // large_cap|mid_cap|balanced|growth|value
+  double peer_return = 3;
+  double percentile_rank = 4;          // 百分位排名
+  string relative_performance = 5;     // outperform|underperform|inline
+}
+
+message AnalysisInsight {
+  string insight_type = 1;             // strength|weakness|opportunity|risk
+  string title = 2;
+  string description = 3;
+  double impact_score = 4;             // 影响评分 0-1
+  string recommendation = 5;           // 建议行动
+  repeated string supporting_metrics = 6;
+}
+
+// ==================== 通用类型 ====================
+message TimeRange {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message AnalysisOptions {
+  bool include_charts = 1;
+  bool use_ml_models = 2;
+  string language = 3;             // zh|en
+  repeated string exclude_factors = 4;
+  map<string, string> custom_params = 5;
+  string output_detail = 6;        // summary|standard|detailed
+}
+
+message AnalysisMetadata {
+  string analysis_id = 1;
+  repeated string data_sources = 2;
+  int32 processing_time_ms = 3;
+  string model_version = 4;
+  double data_quality_score = 5;
+  google.protobuf.Timestamp generated_at = 6;
+  repeated string analyst_types_used = 7;
+  double cache_hit_ratio = 8;
+}
+
+message TradingSignal {
+  string signal_type = 1;          // entry|exit|hold|scale_in|scale_out
+  RecommendationAction action = 2;
+  double strength = 3;             // 0-1
+  string timeframe = 4;
+  string reason = 5;
+  double target_price = 6;
+  double stop_loss = 7;
+}
+
+message MarketTrend {
+  string overall_direction = 1;    // bullish|bearish|sideways
+  double strength = 2;             // 0-1
+  string phase = 3;                // early|middle|late
+  double sustainability = 4;        // 趋势可持续性
+}
+
+// 健康检查
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  string status = 1;               // SERVING|NOT_SERVING|UNKNOWN
+  map<string, string> details = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  repeated ServiceDependency dependencies = 4;
+}
+
+message ServiceDependency {
+  string service_name = 1;
+  string status = 2;
+  double response_time_ms = 3;
+  string last_error = 4;
+}
+
+// ==================== 枚举类型 ====================
+enum RecommendationAction {
+  STRONG_BUY = 0;
+  BUY = 1;
+  HOLD = 2;
+  SELL = 3;
+  STRONG_SELL = 4;
+}
+
+enum TimeFrame {
+  SCALPING = 0;     // 几分钟-几小时
+  DAY_TRADING = 1;  // 当日
+  SWING = 2;        // 几天-几周  
+  SHORT_TERM = 3;   // 1-3月
+  MEDIUM_TERM = 4;  // 3-12月
+  LONG_TERM = 5;    // 1年以上
+}
+
+enum RiskRating {
+  VERY_LOW = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+  VERY_HIGH = 4;
+  EXTREME = 5;
+}
+
+enum AlertLevel {
+  INFO = 0;
+  WARNING = 1;
+  CRITICAL = 2;
+  EMERGENCY = 3;
+}
+
+enum Priority {
+  PRIORITY_LOW = 0;
+  PRIORITY_NORMAL = 1;
+  PRIORITY_HIGH = 2;
+  PRIORITY_URGENT = 3;
+}
+
+message InvestmentRating {
+  double score = 1;                // 0-100 综合评分
+  RecommendationAction action = 2;
+  double target_price = 3;
+  double price_range_low = 4;
+  double price_range_high = 5;
+  TimeFrame time_horizon = 6;
+  string rating_methodology = 7;   // 评级方法
+  repeated RatingComponent components = 8;
+}
+
+message RatingComponent {
+  string component_name = 1;       // valuation|growth|quality|momentum
+  double score = 2;                // 该维度评分
+  double weight = 3;               // 在总评分中的权重
+  string assessment = 4;           // 评估说明
+}

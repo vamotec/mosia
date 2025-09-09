@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package fetcher;
+
+option java_multiple_files = true;
+option java_package = "app.mosia.grpc";
+
+import "timestamp.proto";
+
+// Main Fetcher Service
+service FetcherService {
+  // Data Fetching
+  rpc FetchExternalData(FetchRequest) returns (FetchResponse);
+  rpc FetchBulkData(BulkFetchRequest) returns (stream FetchResponse);
+  rpc ScheduleFetch(ScheduleFetchRequest) returns (ScheduleFetchResponse);
+  
+  // Data Processing
+  rpc ProcessData(ProcessingRequest) returns (ProcessingResponse);
+  rpc ValidateData(ValidationRequest) returns (ValidationResponse);
+  rpc EnrichData(EnrichmentRequest) returns (EnrichmentResponse);
+}
+
+// Fetch Request Messages
+message FetchRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string source_type = 3; // api, web, file, stream
+  string source_url = 4;
+  map<string, string> parameters = 5;
+  map<string, string> headers = 6;
+  FetchOptions options = 7;
+}
+
+message FetchOptions {
+  int32 timeout_seconds = 1;
+  int32 retry_count = 2;
+  bool cache_enabled = 3;
+  string cache_ttl = 4;
+  bool async_processing = 5;
+  string output_format = 6; // json, xml, csv, raw
+}
+
+message FetchResponse {
+  string fetch_id = 1;
+  string status = 2; // success, error, processing, partial
+  bytes data = 3;
+  string content_type = 4;
+  map<string, string> metadata = 5;
+  string error_message = 6;
+  timestamp.Timestamp timestamp = 7;
+  int64 size_bytes = 8;
+  double processing_time_seconds = 9;
+}
+
+message BulkFetchRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  repeated FetchRequest requests = 3;
+  BulkOptions options = 4;
+}
+
+message BulkOptions {
+  int32 max_concurrent = 1;
+  bool stop_on_error = 2;
+  int32 timeout_seconds = 3;
+}
+
+message ScheduleFetchRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  FetchRequest fetch_request = 3;
+  string schedule = 4; // cron expression
+  string schedule_name = 5;
+}
+
+message ScheduleFetchResponse {
+  string schedule_id = 1;
+  bool success = 2;
+  string message = 3;
+  timestamp.Timestamp next_run = 4;
+}
+
+// Processing Messages
+message ProcessingRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  bytes raw_data = 3;
+  string data_type = 4; // json, xml, csv, text, binary
+  string processing_type = 5; // parse, transform, validate, enrich
+  map<string, string> parameters = 6;
+}
+
+message ProcessingResponse {
+  string processing_id = 1;
+  string status = 2;
+  bytes processed_data = 3;
+  string output_format = 4;
+  map<string, string> metadata = 5;
+  repeated ProcessingError errors = 6;
+  timestamp.Timestamp processed_at = 7;
+}
+
+message ProcessingError {
+  string code = 1;
+  string message = 2;
+  string field = 3;
+  int32 line_number = 4;
+}
+
+message ValidationRequest {
+  string user_id = 1;
+  bytes data = 2;
+  string schema_type = 3; // json_schema, xsd, custom
+  string schema_definition = 4;
+  ValidationOptions options = 5;
+}
+
+message ValidationOptions {
+  bool strict_mode = 1;
+  bool return_errors_only = 2;
+  int32 max_errors = 3;
+}
+
+message ValidationResponse {
+  bool is_valid = 1;
+  repeated ValidationError errors = 2;
+  map<string, string> metadata = 3;
+  timestamp.Timestamp validated_at = 4;
+}
+
+message ValidationError {
+  string path = 1;
+  string message = 2;
+  string error_code = 3;
+  string expected = 4;
+  string actual = 5;
+}
+
+message EnrichmentRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  bytes data = 3;
+  string data_type = 4;
+  repeated string enrichment_types = 5; // metadata, geocoding, sentiment, classification
+  map<string, string> parameters = 6;
+}
+
+message EnrichmentResponse {
+  string enrichment_id = 1;
+  bytes enriched_data = 2;
+  map<string, string> enrichments = 3;
+  repeated EnrichmentResult results = 4;
+  timestamp.Timestamp enriched_at = 5;
+}
+
+message EnrichmentResult {
+  string type = 1;
+  string status = 2;
+  map<string, string> data = 3;
+  double confidence = 4;
+}

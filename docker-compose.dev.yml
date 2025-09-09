@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/main_service/moscala/src/main/resources/db/migration:/docker-entrypoint-initdb.d
+      - ./backend/main/src/main/resources/db/migration:/docker-entrypoint-initdb.d
     networks:
       - mosia-network
 

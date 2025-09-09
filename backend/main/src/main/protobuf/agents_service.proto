@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package agents;
+
+option java_multiple_files = true;
+option java_package = "app.mosia.grpc";
+
+import "timestamp.proto";
+
+// Main Agents Service
+service AgentsService {
+  // Content Analysis
+  rpc AnalyzeContent(ContentAnalysisRequest) returns (ContentAnalysisResponse);
+  rpc ExtractKeywords(KeywordExtractionRequest) returns (KeywordExtractionResponse);
+  rpc AnalyzeSentiment(SentimentAnalysisRequest) returns (SentimentAnalysisResponse);
+  
+  // Recommendations
+  rpc GetRecommendations(RecommendationRequest) returns (RecommendationResponse);
+  rpc UpdateUserPreferences(UserPreferencesRequest) returns (UserPreferencesResponse);
+  
+  // Content Generation
+  rpc GenerateContent(ContentGenerationRequest) returns (ContentGenerationResponse);
+  rpc SummarizeText(SummarizationRequest) returns (SummarizationResponse);
+  
+  // Conversational AI
+  rpc ProcessChat(ChatRequest) returns (ChatResponse);
+  rpc GetChatHistory(ChatHistoryRequest) returns (ChatHistoryResponse);
+}
+
+// Content Analysis Messages
+message ContentAnalysisRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string content = 3;
+  string content_type = 4; // text, markdown, document, code
+  map<string, string> metadata = 5;
+}
+
+message ContentAnalysisResponse {
+  string analysis_id = 1;
+  repeated string keywords = 2;
+  string sentiment = 3;
+  double confidence = 4;
+  repeated string topics = 5;
+  string summary = 6;
+  map<string, string> insights = 7;
+  timestamp.Timestamp analyzed_at = 8;
+}
+
+message KeywordExtractionRequest {
+  string content = 1;
+  int32 max_keywords = 2;
+  string language = 3;
+}
+
+message KeywordExtractionResponse {
+  repeated Keyword keywords = 1;
+}
+
+message Keyword {
+  string text = 1;
+  double score = 2;
+  string category = 3;
+}
+
+message SentimentAnalysisRequest {
+  string content = 1;
+  string language = 2;
+}
+
+message SentimentAnalysisResponse {
+  string sentiment = 1; // positive, negative, neutral
+  double score = 2; // -1.0 to 1.0
+  double confidence = 3;
+  map<string, double> emotions = 4;
+}
+
+// Recommendation Messages
+message RecommendationRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string context = 3;
+  int32 limit = 4;
+  repeated string filters = 5;
+  string recommendation_type = 6; // content, action, connection, learning
+}
+
+message RecommendationResponse {
+  repeated Recommendation recommendations = 1;
+  string recommendation_context = 2;
+  timestamp.Timestamp generated_at = 3;
+}
+
+message Recommendation {
+  string id = 1;
+  string type = 2; // content, action, connection, learning
+  string title = 3;
+  string description = 4;
+  double confidence = 5;
+  map<string, string> metadata = 6;
+  string reason = 7;
+}
+
+message UserPreferencesRequest {
+  string user_id = 1;
+  map<string, string> preferences = 2;
+  repeated string interests = 3;
+}
+
+message UserPreferencesResponse {
+  bool success = 1;
+  string message = 2;
+  timestamp.Timestamp updated_at = 3;
+}
+
+// Content Generation Messages
+message ContentGenerationRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string prompt = 3;
+  string content_type = 4; // text, markdown, code, email
+  map<string, string> parameters = 5;
+  GenerationOptions options = 6;
+}
+
+message GenerationOptions {
+  int32 max_length = 1;
+  double temperature = 2;
+  string style = 3; // formal, casual, technical, creative
+  string language = 4;
+}
+
+message ContentGenerationResponse {
+  string generated_content = 1;
+  string generation_id = 2;
+  map<string, string> metadata = 3;
+  timestamp.Timestamp generated_at = 4;
+}
+
+message SummarizationRequest {
+  string content = 1;
+  int32 max_length = 2;
+  string summary_type = 3; // bullet_points, paragraph, abstract
+}
+
+message SummarizationResponse {
+  string summary = 1;
+  repeated string key_points = 2;
+  map<string, string> metadata = 3;
+}
+
+// Chat Messages
+message ChatRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string message = 3;
+  string session_id = 4;
+  map<string, string> context = 5;
+}
+
+message ChatResponse {
+  string response = 1;
+  string session_id = 2;
+  map<string, string> context = 3;
+  repeated string suggestions = 4;
+  timestamp.Timestamp timestamp = 5;
+}
+
+message ChatHistoryRequest {
+  string user_id = 1;
+  string session_id = 2;
+  int32 limit = 3;
+}
+
+message ChatHistoryResponse {
+  repeated ChatMessage messages = 1;
+}
+
+message ChatMessage {
+  string id = 1;
+  string user_id = 2;
+  string message = 3;
+  string response = 4;
+  timestamp.Timestamp timestamp = 5;
+}

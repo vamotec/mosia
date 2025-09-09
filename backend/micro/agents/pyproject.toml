@@ -1,0 +1,60 @@
+[project]
+name = "agents"
+version = "0.1.0"
+description = "AI Agents microservice for Mosia - content analysis, recommendations, and AI generation"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.66.0",
+    "asyncpg>=0.30.0",
+    "chromadb>=1.0.20",
+    "dotenv>=0.9.9",
+    "grpcio>=1.74.0",
+    "grpcio-health-checking>=1.74.0",
+    "grpcio-tools>=1.74.0",
+    "langchain-openai>=0.3.32",
+    "langgraph>=0.6.7",
+    "openai>=1.106.1",
+    "pandas>=2.3.2",
+    "protobuf>=6.32.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "redis>=6.4.0",
+    "structlog>=25.4.0",
+    "uvloop>=0.21.0",
+    "hatchling>=1.27.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "mypy>=1.17.1",
+    "pytest>=8.4.2",
+]
